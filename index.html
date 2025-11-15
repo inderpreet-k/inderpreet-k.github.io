@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inderpreet Kaur: Portfolio</title>
+  <title>Inderpreet Kaur · Portfolio</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="page-wrap">
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
+  <!-- NAVBAR (full-width band, centered content) -->
+  <nav class="navbar">
+    <div class="nav-inner">
       <div class="nav-left">Inderpreet Kaur</div>
       <div class="nav-right">
         <a href="#about">About</a>
@@ -19,24 +19,33 @@
         <a href="#academics">Academics</a>
         <a href="#contact" class="nav-cta">Contact</a>
       </div>
-    </nav>
+    </div>
+  </nav>
+
+  <!-- PAGE CONTENT -->
+  <main class="page-wrap">
 
     <!-- HERO -->
     <header class="hero">
       <div class="hero-inner">
-        <div class="hero-accent"></div>
-        <div class="hero-content">
-          <p class="hero-kicker">IT student · builder · future data / AI professional</p>
-          <h1 class="hero-title">
-            I build practical&nbsp;<span class="accent">web, data, and AI-driven tools</span>.
-          </h1>
-          <p class="hero-subtitle">
-            I’m Inderpreet, a BTech IT student at KPU in Surrey, BC. I like turning real problems from work
-            and school into working apps, automations, and databases.
+        <div class="hero-text">
+          <p class="hero-kicker">
+            IT STUDENT · BUILDER · FUTURE DATA / AI PROFESSIONAL
           </p>
+
+          <h1 class="hero-title">
+            I build practical <span class="accent">web, data, and AI-driven tools.</span>
+          </h1>
+
+          <p class="hero-subtitle">
+            I’m Inderpreet, a BTech IT student at KPU in Surrey, BC. I like turning real
+            problems from work and school into working apps, automations, and databases.
+          </p>
+
           <p class="hero-meta">
             Surrey, BC · Canadian Citizen · Open to co-op & internship roles
           </p>
+
           <div class="hero-actions">
             <a href="#projects" class="btn-primary">View projects</a>
             <a href="resume.pdf" class="btn-ghost" download>Download resume</a>
@@ -159,8 +168,8 @@
           </p>
           <p class="card-meta">Processing · Java</p>
           <div class="card-actions">
-            <a href="https://github.com/inderpreet-k/Colour-Catching" target="_blank" rel="noopener" class="card-link">GitHub repo ↗</a>
-            <a href="https://youtu.be/r7MFN_UnLB8" target="_blank" rel="noopener" class="card-link">Watch demo ↗</a>
+            <a href="https://github.com/inderpreet-k/shape-Catching-and-Color-sorting" target="_blank" class="card-link">GitHub repo ↗</a>
+            <a href="https://youtu.be/r7MFN_UnLB8" target="_blank" class="card-link">Watch demo ↗</a>
           </div>
         </article>
 
@@ -173,7 +182,7 @@
             generate and schedule posts automatically.
           </p>
           <p class="card-meta">Concept · Prompt design · Automation</p>
-          <p class="chip-inline">In development: details coming soon</p>
+          <p class="chip-inline">In development — details coming soon</p>
         </article>
 
         <!-- MyProjectNest -->
@@ -184,8 +193,8 @@
             A central space for students to store and share academic projects, with QR-code sharing and
             AI-powered indexing for fast search.
           </p>
-          <p class="card-meta">SaaS concept · UX · information architecture</p>
-          <p class="chip-inline">In development: details coming soon</p>
+          <p class="card-meta">SaaS concept · UX · Information architecture</p>
+          <p class="chip-inline">In development — details coming soon</p>
         </article>
 
         <!-- Catering -->
@@ -208,7 +217,7 @@
             orders and inventory.
           </p>
           <p class="card-meta">Web fundamentals · PHP · MySQL</p>
-          <p class="card-note">Archived project:  code available on request.</p>
+          <p class="card-note">Archived project — code available on request.</p>
         </article>
 
       </div>
@@ -323,16 +332,28 @@
             <a href="tel:17783254020">+1 (778) 325-4020</a>
           </p>
         </div>
+        <div>
+          <p><strong>LinkedIn</strong><br />
+            <a href="https://www.linkedin.com/in/inderpreet-kaur29/" target="_blank">
+              linkedin.com/in/inderpreet-kaur29
+            </a>
+          </p>
+        </div>
       </div>
     </section>
 
     <!-- FOOTER -->
     <footer class="footer">
-      <p>© 2025 Inderpreet Kaur. Built and deployed with GitHub Pages.</p>
+      <p>© 2025 Inderpreet Kaur.</p>
+      <p>
+        <a href="https://www.linkedin.com/in/inderpreet-kaur29/" target="_blank" class="footer-link">
+          LinkedIn
+        </a>
+        · Built & deployed with GitHub Pages.
+      </p>
     </footer>
 
-  </div>
+  </main>
 
-  <script src="script.js"></script>
 </body>
 </html>
