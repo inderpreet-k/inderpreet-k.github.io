@@ -1,364 +1,1047 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inderpreet Kaur · Portfolio</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inderpreet Kaur — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#F4F0E8;--dark:#1A1A17;--amber:#C17D3C;--amber-light:#E8A855;
+  --mid:#888880;--faint:#D8D3C8;--surface:#EDE9E0;--green:#7BC67E;
+}
+html{width:100%;height:100%;overflow:hidden}
+body{width:100%;height:100%;overflow:hidden;background:var(--dark);margin:0}
+@media(pointer:fine){body{cursor:none}}
+
+/* ── CURSOR (desktop only) ── */
+#cursor,#cursor-ring{display:none}
+@media(pointer:fine){
+  #cursor{display:block;position:fixed;width:10px;height:10px;background:var(--amber);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+  #cursor-ring{display:block;position:fixed;width:36px;height:36px;border:1px solid var(--amber);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .12s ease}
+  body:has(a:hover) #cursor,body:has(button:hover) #cursor{width:18px;height:18px;background:var(--amber-light)}
+  body:has(a:hover) #cursor-ring,body:has(button:hover) #cursor-ring{width:54px;height:54px;opacity:.4}
+}
+
+/* ── PAGE ENGINE ── */
+#app{position:fixed;top:0;left:0;right:0;bottom:0}
+@media(max-width:768px){#app{bottom:60px}}
+.page{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;overflow:hidden}
+.page.active{opacity:1;pointer-events:all}
+.page.siR{animation:siR .55s cubic-bezier(.77,0,.18,1) forwards}
+.page.siL{animation:siL .55s cubic-bezier(.77,0,.18,1) forwards}
+.page.soL{animation:soL .55s cubic-bezier(.77,0,.18,1) forwards}
+.page.soR{animation:soR .55s cubic-bezier(.77,0,.18,1) forwards}
+@keyframes siR{from{transform:translateX(100%);opacity:1}to{transform:translateX(0);opacity:1}}
+@keyframes siL{from{transform:translateX(-100%);opacity:1}to{transform:translateX(0);opacity:1}}
+@keyframes soL{from{transform:translateX(0);opacity:1}to{transform:translateX(-100%);opacity:1}}
+@keyframes soR{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes ripple{0%{transform:scale(.8);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@keyframes barIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes barGrow{from{width:0}to{width:var(--w)}}
+
+/* ── SIDE PIPS (desktop) ── */
+.pips{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:200}
+.pip{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.18);cursor:pointer;transition:all .3s;border:none;padding:0}
+.pip.on{background:var(--amber);height:20px;border-radius:2px}
+@media(max-width:768px){.pips{display:none}}
+
+/* ── SCROLL HINT ── */
+#hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);text-align:center;z-index:50;pointer-events:none;transition:opacity .5s}
+#hint p{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.18);margin-bottom:3px}
+#hint i{font-style:normal;font-size:11px;color:rgba(255,255,255,.13)}
+@media(max-width:768px){#hint{display:none}}
+
+/* ── NAV ── */
+nav{display:flex;justify-content:space-between;align-items:center;padding:12px 32px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;position:relative;z-index:100}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--cream)}
+.logo b{color:var(--amber);font-weight:400}
+.nav-links{display:flex}
+.nl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.28);padding:8px 14px;cursor:pointer;border:none;background:none;transition:color .2s;border-right:1px solid rgba(255,255,255,.07)}
+.nl:last-child{border-right:none}
+.nl.on,.nl:hover{color:var(--amber)}
+.nav-live{display:flex;align-items:center;gap:7px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
+.live-txt{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);letter-spacing:1px}
+
+/* hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;border:none;background:none;padding:6px}
+.hamburger span{width:22px;height:1.5px;background:var(--cream);transition:all .3s;display:block}
+.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(4.5px,4.5px)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(4.5px,-4.5px)}
+
+/* mobile nav drawer */
+.mob-nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--dark);border-bottom:1px solid rgba(255,255,255,.1);z-index:99;flex-direction:column}
+.mob-nav.open{display:flex}
+.mob-nl{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);padding:16px 28px;border-bottom:.5px solid rgba(255,255,255,.06);cursor:pointer;border:none;background:none;text-align:left;transition:color .2s}
+.mob-nl.on,.mob-nl:hover{color:var(--amber)}
+
+/* mobile tab bar */
+.mob-tabs{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(15,15,13,.97);border-top:.5px solid rgba(255,255,255,.1);padding:6px 0 max(6px,env(safe-area-inset-bottom));z-index:300}
+.mob-tabs-inner{display:flex;justify-content:space-around}
+.mob-tab{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:none;padding:4px 10px;min-width:56px;-webkit-tap-highlight-color:transparent}
+.mob-tab-icon{font-style:normal;font-size:16px;line-height:1}
+.mob-tab-lbl{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3);transition:color .2s}
+.mob-tab.on .mob-tab-lbl{color:var(--amber)}
+
+@media(max-width:768px){
+  nav{padding:12px 20px}
+  .nav-links,.nav-live{display:none}
+  .hamburger{display:flex}
+  .mob-tabs{display:block}
+}
+
+/* ═══════════════════════════════════════
+   PAGE 1 · HOME
+═══════════════════════════════════════ */
+#ph{background:var(--dark)}
+.ph-ticker{background:var(--amber);height:30px;overflow:hidden;display:flex;align-items:center;flex-shrink:0}
+.tk-inner{display:inline-flex;animation:ticker 26s linear infinite;white-space:nowrap;align-items:center}
+.tk-i{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dark);letter-spacing:2px;text-transform:uppercase;padding:0 16px;border-right:1px solid rgba(0,0,0,.13);height:30px;display:flex;align-items:center}
+
+/* desktop home layout */
+.ph-body{flex:1;display:grid;grid-template-columns:1fr 360px;overflow:hidden}
+.ph-left{padding:36px 32px 28px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid rgba(255,255,255,.07);position:relative;overflow:hidden}
+.ph-ghost{position:absolute;bottom:-20px;left:-6px;font-family:'Bebas Neue',sans-serif;font-size:200px;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.032);pointer-events:none;white-space:nowrap;letter-spacing:5px;user-select:none}
+.ph-eye{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--amber);margin-bottom:14px;animation:fadeUp .8s .1s both}
+.ph-name{font-family:'Bebas Neue',sans-serif;font-size:96px;line-height:.84;color:var(--cream);letter-spacing:2px;animation:fadeUp .8s .2s both}
+.ph-name .a{color:var(--amber)}
+.ph-name .o{color:transparent;-webkit-text-stroke:1.5px var(--cream)}
+.ph-role{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--mid);margin-top:14px;animation:fadeUp .8s .32s both}
+.ph-desc{font-size:13px;color:rgba(255,255,255,.42);line-height:1.75;max-width:460px;margin-top:10px;animation:fadeUp .8s .42s both}
+.ph-desc b{color:rgba(255,255,255,.78);font-weight:500}
+.ph-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;animation:fadeUp .8s .52s both}
+.ph-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;border:.5px solid rgba(255,255,255,.13);color:var(--mid);padding:5px 12px;letter-spacing:.8px}
+.ph-tag.hi{border-color:var(--amber);color:var(--amber)}
+.ph-tag.gr{border-color:rgba(123,198,126,.4);color:var(--green)}
+.ph-cta{display:flex;gap:10px;margin-top:20px;animation:fadeUp .8s .62s both;flex-wrap:wrap}
+.btn-a{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;background:var(--amber);color:var(--dark);padding:12px 24px;border:none;cursor:pointer;transition:background .2s}
+.btn-a:hover{background:var(--amber-light)}
+.btn-b{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;background:transparent;color:var(--cream);padding:12px 24px;border:.5px solid rgba(255,255,255,.2);cursor:pointer;transition:border-color .2s,color .2s}
+.btn-b:hover{border-color:var(--amber);color:var(--amber)}
+.ph-foot{font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,.14);letter-spacing:1px}
+
+.ph-right{display:flex;flex-direction:column;overflow:hidden}
+.ph-stat{padding:0 24px;border-bottom:1px solid rgba(255,255,255,.07);flex:1;display:flex;flex-direction:column;justify-content:center;animation:fadeUp .8s both}
+.ph-stat:nth-child(1){animation-delay:.18s}.ph-stat:nth-child(2){animation-delay:.28s}.ph-stat:nth-child(3){animation-delay:.38s}.ph-stat:nth-child(4){animation-delay:.48s}
+.ph-stat:last-child{border-bottom:none}
+.ph-stat-n{font-family:'Bebas Neue',sans-serif;font-size:46px;color:var(--amber);line-height:1}
+.ph-stat-l{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.22);margin-top:1px}
+.ph-stat-s{font-size:11px;color:rgba(255,255,255,.44);margin-top:3px}
+
+/* mobile home */
+@media(max-width:768px){
+  .ph-body{grid-template-columns:1fr;grid-template-rows:1fr auto}
+  .ph-left{padding:28px 22px 20px;border-right:none;border-bottom:1px solid rgba(255,255,255,.07)}
+  .ph-ghost{font-size:120px}
+  .ph-name{font-size:64px}
+  .ph-desc{font-size:12px;margin-top:10px}
+  .ph-right{display:grid;grid-template-columns:1fr 1fr;overflow:hidden;flex-shrink:0}
+  .ph-stat{padding:14px 18px;flex:none;border-bottom:.5px solid rgba(255,255,255,.07);border-right:.5px solid rgba(255,255,255,.07)}
+  .ph-stat:nth-child(2n){border-right:none}
+  .ph-stat:nth-last-child(-n+2){border-bottom:none}
+  .ph-stat-n{font-size:32px}
+  .ph-foot{display:none}
+}
+
+/* ═══════════════════════════════════════
+   PAGE 2 · PROJECTS
+═══════════════════════════════════════ */
+#pp{background:var(--dark)}
+.pp-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:24px 28px 32px}
+.pp-body::-webkit-scrollbar{width:3px}
+.pp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+
+.pp-page-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:22px;flex-wrap:wrap;gap:6px}
+.pp-page-title{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--cream);letter-spacing:2px;line-height:1}
+.pp-page-sub{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.25);letter-spacing:2px}
+
+/* uniform grid — desktop 3col, tablet 2col, mobile 1col */
+.pp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+@media(max-width:900px){.pp-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.pp-grid{grid-template-columns:1fr}}
+
+/* card */
+.pp-card{background:rgba(255,255,255,.03);border:.5px solid rgba(255,255,255,.08);padding:20px 20px 16px;display:flex;flex-direction:column;position:relative;overflow:hidden;cursor:default;transition:background .3s,border-color .3s,transform .2s}
+@media(pointer:fine){
+  .pp-card:hover{background:rgba(255,255,255,.06);border-color:rgba(193,125,60,.4);transform:translateY(-2px)}
+  .pp-card:hover .pp-card-expand{max-height:440px;opacity:1;margin-top:14px}
+  .pp-card:hover .pp-card-hint{opacity:0}
+}
+/* mobile — tap to toggle */
+.pp-card.tapped{background:rgba(255,255,255,.06);border-color:rgba(193,125,60,.4)}
+.pp-card.tapped .pp-card-expand{max-height:440px;opacity:1;margin-top:14px}
+.pp-card.tapped .pp-card-hint{opacity:0}
+
+.pp-card-bg{position:absolute;bottom:-10px;right:8px;font-family:'Bebas Neue',sans-serif;font-size:56px;color:rgba(255,255,255,.04);pointer-events:none;line-height:1}
+.pp-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.pp-card-type{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.28)}
+.pp-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:3px 8px;letter-spacing:1px;flex-shrink:0}
+.pp-badge.live{background:rgba(123,198,126,.15);color:var(--green);border:.5px solid rgba(123,198,126,.3)}
+.pp-badge.wip{background:rgba(193,125,60,.2);color:var(--amber);border:.5px solid rgba(193,125,60,.4)}
+.pp-badge.team{background:rgba(255,255,255,.06);color:rgba(255,255,255,.4);border:.5px solid rgba(255,255,255,.12)}
+.pp-badge.arch{background:rgba(255,255,255,.04);color:rgba(255,255,255,.28);border:.5px solid rgba(255,255,255,.08)}
+.pp-bar{height:1.5px;background:rgba(255,255,255,.07);margin-bottom:12px;position:relative}
+.pp-bar-fill{position:absolute;top:0;left:0;height:100%;background:var(--amber)}
+.pp-card-title{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--cream);line-height:1}
+.pp-card-hint{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.18);margin-top:8px;transition:opacity .2s}
+@media(max-width:768px){.pp-card-hint{content:'Tap to expand ↓'}}
+
+/* expandable content */
+.pp-card-expand{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.77,0,.18,1),opacity .3s ease,margin .3s ease;opacity:0;margin-top:0}
+.pp-card-desc{font-size:11px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:12px}
+.pp-card-desc b{color:rgba(255,255,255,.78);font-weight:500}
+.pp-stack{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.pp-tech{font-family:'IBM Plex Mono',monospace;font-size:9px;border:.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.38);padding:3px 8px}
+.pp-link{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--amber);letter-spacing:1px;text-decoration:none;text-transform:uppercase;display:inline-block;margin-bottom:4px}
+.pp-link:hover{text-decoration:underline}
+
+/* analytics */
+.an-panel{background:rgba(0,0,0,.3);border:.5px solid rgba(255,255,255,.06);padding:12px 13px;margin-top:4px}
+.an-label{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:9px}
+.an-bar-row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.an-bar-row:last-child{margin-bottom:0}
+.an-bar-name{font-family:'IBM Plex Mono',monospace;font-size:8px;color:rgba(255,255,255,.32);width:88px;flex-shrink:0;text-align:right}
+.an-bar-track{flex:1;height:4px;background:rgba(255,255,255,.06);overflow:hidden}
+.an-bar-fill{height:100%;background:var(--amber);transform-origin:left;animation:barIn .9s cubic-bezier(.77,0,.18,1) both}
+.an-bar-fill.green{background:var(--green)}
+.an-bar-fill.dim{background:rgba(255,255,255,.16)}
+.an-bar-val{font-family:'IBM Plex Mono',monospace;font-size:8px;color:rgba(255,255,255,.28);width:26px;flex-shrink:0}
+.an-stats-row{display:flex}
+.an-stat{text-align:center;flex:1;padding:7px 4px;border-right:.5px solid rgba(255,255,255,.06)}
+.an-stat:last-child{border-right:none}
+.an-stat-n{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--amber);line-height:1}
+.an-stat-l{font-family:'IBM Plex Mono',monospace;font-size:7px;color:rgba(255,255,255,.22);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* heatmap */
+.pp-heatmap{background:rgba(255,255,255,.02);border:.5px solid rgba(255,255,255,.06);padding:18px 20px}
+.pp-heatmap-title{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:14px}
+.hm-header-row{display:flex;gap:0;margin-bottom:5px;padding-left:108px}
+.hm-tech-lbl{flex:1;font-family:'IBM Plex Mono',monospace;font-size:7px;color:rgba(255,255,255,.2);text-align:center}
+.hm-row{display:flex;gap:0;margin-bottom:3px;align-items:center}
+.hm-proj-name{font-family:'IBM Plex Mono',monospace;font-size:8px;color:rgba(255,255,255,.28);width:108px;flex-shrink:0;text-align:right;padding-right:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-cell{flex:1;height:18px;margin:0 1px;transition:opacity .2s}
+.hm-cell:hover{opacity:.7}
+.hm-0{background:rgba(255,255,255,.04)}.hm-1{background:rgba(193,125,60,.18)}.hm-2{background:rgba(193,125,60,.42)}.hm-3{background:rgba(193,125,60,.78)}
+.hm-footer{display:flex;align-items:center;justify-content:flex-end;gap:5px;margin-top:9px}
+.hm-legend-lbl{font-family:'IBM Plex Mono',monospace;font-size:7px;color:rgba(255,255,255,.2)}
+.hm-legend-cell{width:14px;height:7px;margin:0 1px}
+@media(max-width:560px){.pp-heatmap{display:none}}
+
+@media(max-width:768px){
+  .pp-body{padding:18px 16px 24px}
+  .pp-page-sub{display:none}
+}
+
+/* ═══════════════════════════════════════
+   PAGE 3 · SKILLS
+═══════════════════════════════════════ */
+#psk{background:var(--dark)}
+.psk-body{flex:1;display:grid;grid-template-columns:44px 1fr;overflow:hidden}
+.psk-side{background:rgba(255,255,255,.02);border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:18px 0}
+.psk-side-lbl{writing-mode:vertical-rl;transform:rotate(180deg);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.2)}
+.psk-main{display:flex;flex-direction:column;overflow:hidden}
+.psk-header{padding:18px 28px 14px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+.psk-header-title{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--cream);letter-spacing:2px;line-height:1}
+.psk-header-sub{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.25);letter-spacing:2px}
+.psk-cols{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;overflow:hidden}
+.psk-col{border-right:1px solid rgba(255,255,255,.07);padding:16px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+.psk-col::-webkit-scrollbar{width:2px}
+.psk-col::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+.psk-col:last-child{border-right:none}
+.psk-group-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:13px;display:flex;align-items:center;gap:8px}
+.psk-group-label::after{content:'';flex:1;height:.5px;background:rgba(193,125,60,.22)}
+.psk-item{margin-bottom:10px}
+.psk-item:last-child{margin-bottom:0}
+.psk-item-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.psk-item-name{font-size:12px;color:rgba(255,255,255,.75);font-weight:500}
+.psk-item-level{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.25);letter-spacing:1px}
+.psk-bar-track{height:2px;background:rgba(255,255,255,.07);overflow:hidden}
+.psk-bar-fill{height:100%;background:var(--amber);--w:0%;animation:barGrow 1.2s cubic-bezier(.77,0,.18,1) forwards}
+.psk-pill-group{display:flex;flex-wrap:wrap;gap:5px}
+.psk-pill{font-size:10px;padding:5px 12px;border:.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);letter-spacing:.3px;transition:border-color .2s,color .2s;cursor:default}
+.psk-pill:hover{border-color:var(--amber);color:var(--amber)}
+.psk-pill.hi{border-color:rgba(193,125,60,.35);color:var(--amber);background:rgba(193,125,60,.07)}
+.psk-cert{border:.5px solid rgba(255,255,255,.08);padding:11px 13px;margin-bottom:7px;transition:border-color .2s}
+.psk-cert:hover{border-color:var(--amber)}
+.psk-cert:last-child{margin-bottom:0}
+.psk-cert-title{font-size:11px;font-weight:500;color:rgba(255,255,255,.75);margin-bottom:3px}
+.psk-cert-org{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.28);letter-spacing:1px}
+
+/* radar */
+.radar-section{border-top:1px solid rgba(255,255,255,.07);padding:14px 20px;flex-shrink:0;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.radar-wrap{flex-shrink:0}
+.radar-legend{display:flex;flex-direction:column;gap:7px}
+.radar-legend-item{display:flex;align-items:center;gap:8px}
+.radar-legend-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0}
+.radar-legend-name{font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.4);letter-spacing:1px}
+.radar-legend-val{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--amber);line-height:1;margin-left:auto;padding-left:12px}
+.radar-note{font-family:'IBM Plex Mono',monospace;font-size:8px;color:rgba(255,255,255,.18);letter-spacing:1px;margin-top:7px;font-style:italic}
+
+/* mobile skills — scrollable single column */
+@media(max-width:768px){
+  .psk-body{grid-template-columns:1fr}
+  .psk-side{display:none}
+  .psk-cols{grid-template-columns:1fr;overflow-y:auto;overflow-x:hidden}
+  .psk-col{border-right:none;border-bottom:1px solid rgba(255,255,255,.06);overflow-y:visible}
+  .psk-col:last-child{border-bottom:none}
+  .radar-section{flex-direction:column;align-items:flex-start}
+  .psk-header{padding:14px 18px 12px}
+}
+
+/* ═══════════════════════════════════════
+   PAGE 4 · ABOUT
+═══════════════════════════════════════ */
+#pa{background:var(--dark)}
+.pa-body{flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.pa-left{padding:28px 32px;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.07);overflow-y:auto}
+.pa-left::-webkit-scrollbar{width:2px}
+.pa-left::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+.pa-sec-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--amber);margin-bottom:10px}
+.pa-big{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--cream);line-height:1;margin-bottom:10px}
+.pa-txt{font-size:12px;color:rgba(255,255,255,.43);line-height:1.8;margin-bottom:20px}
+.pa-txt b{color:rgba(255,255,255,.78);font-weight:500}
+.pa-divider{height:.5px;background:rgba(255,255,255,.07);margin:2px 0 16px}
+.pa-exp-row{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:9px 0;border-bottom:.5px solid rgba(255,255,255,.06);align-items:start}
+.pa-exp-row:last-child{border-bottom:none}
+.pa-yr{font-family:'Bebas Neue',sans-serif;font-size:20px;color:rgba(255,255,255,.14);line-height:1}
+.pa-co{font-size:12px;font-weight:500;color:var(--cream);margin-bottom:2px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.pa-now{font-family:'IBM Plex Mono',monospace;font-size:9px;background:rgba(123,198,126,.14);color:var(--green);padding:2px 7px}
+.pa-role{font-size:11px;color:var(--mid);line-height:1.5}
+.pa-role b{color:rgba(255,255,255,.58);font-weight:500}
+.pa-right{display:flex;flex-direction:column;overflow:hidden}
+.pa-awards{background:var(--amber);padding:24px 28px;flex-shrink:0}
+.pa-awards-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(0,0,0,.4);margin-bottom:13px}
+.pa-award-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pa-award{border-top:1px solid rgba(0,0,0,.13);padding-top:9px}
+.pa-award-n{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--dark);line-height:1}
+.pa-award-l{font-size:10px;color:rgba(0,0,0,.52);margin-top:1px;line-height:1.4}
+.pa-edu{padding:20px 28px;flex:1;overflow-y:auto}
+.pa-edu::-webkit-scrollbar{width:2px}
+.pa-edu::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+.pa-edu-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:14px}
+.pa-edu-item{border-left:2px solid rgba(255,255,255,.07);padding:0 0 18px 14px;margin-bottom:4px;transition:border-color .2s}
+.pa-edu-item:hover{border-left-color:var(--amber)}
+.pa-edu-item:last-child{padding-bottom:0}
+.pa-edu-deg{font-size:13px;font-weight:500;color:var(--cream);margin-bottom:3px}
+.pa-edu-school{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--amber);letter-spacing:1px;margin-bottom:4px}
+.pa-edu-detail{font-size:11px;color:rgba(255,255,255,.35);line-height:1.6}
+.pa-edu-detail b{color:rgba(255,255,255,.6);font-weight:500}
+.pa-langs{padding:13px 28px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.pa-langs-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.18);margin-bottom:7px}
+.pa-lang-row{display:flex;gap:20px;flex-wrap:wrap}
+.pa-lang{font-size:11px;color:rgba(255,255,255,.38)}
+.pa-lang b{color:var(--cream);font-weight:500}
+
+/* mobile about — stacked */
+@media(max-width:768px){
+  .pa-body{grid-template-columns:1fr;overflow-y:auto}
+  .pa-left{border-right:none;border-bottom:1px solid rgba(255,255,255,.07);padding:22px 20px;overflow-y:visible}
+  .pa-right{overflow-y:visible}
+  .pa-edu{overflow-y:visible}
+}
+
+/* ═══════════════════════════════════════
+   PAGE 5 · CONTACT
+═══════════════════════════════════════ */
+#pc{background:var(--dark)}
+.pc-body{flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.pc-left{padding:40px 40px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid rgba(255,255,255,.07)}
+.pc-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+.pc-headline{font-family:'Bebas Neue',sans-serif;font-size:66px;line-height:.86;color:var(--cream);letter-spacing:2px}
+.pc-headline .a{color:var(--amber)}
+.pc-headline .o{color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.28)}
+.pc-sub{font-size:12px;color:rgba(255,255,255,.38);line-height:1.75;max-width:340px;margin-top:14px}
+.pc-sub b{color:rgba(255,255,255,.72);font-weight:500}
+.pc-sub em{color:var(--amber);font-style:normal}
+.pc-links{display:flex;flex-direction:column}
+.pc-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:.5px solid rgba(255,255,255,.07);cursor:pointer;transition:padding-left .25s}
+.pc-row:first-child{border-top:.5px solid rgba(255,255,255,.07)}
+.pc-row:hover{padding-left:10px}
+.pc-row-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:3px}
+.pc-row-val{font-size:12px;color:var(--cream)}
+.pc-arr{font-size:15px;color:var(--amber);transition:transform .25s}
+.pc-row:hover .pc-arr{transform:translateX(7px)}
+.pc-right{display:flex;flex-direction:column}
+.pc-map{flex:1;background:var(--surface);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.pc-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(193,125,60,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(193,125,60,.07) 1px,transparent 1px);background-size:36px 36px}
+.pc-pin{text-align:center;position:relative;z-index:2}
+.pc-pin-ring{width:70px;height:70px;border-radius:50%;background:rgba(193,125,60,.12);border:1px solid rgba(193,125,60,.34);display:flex;align-items:center;justify-content:center;margin:0 auto 13px;position:relative}
+.pc-pin-ring::before{content:'';position:absolute;inset:-12px;border-radius:50%;border:1px solid rgba(193,125,60,.12);animation:ripple 2.2s ease-out infinite}
+.pc-pin-ring::after{content:'';position:absolute;inset:-24px;border-radius:50%;border:1px solid rgba(193,125,60,.05);animation:ripple 2.2s .55s ease-out infinite}
+.pc-pin-dot{width:18px;height:18px;border-radius:50%;background:var(--amber)}
+.pc-city{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--dark);letter-spacing:2px}
+.pc-city-sub{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--mid);letter-spacing:2px;margin-top:3px}
+.pc-bottom{background:var(--amber);padding:18px 26px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-shrink:0}
+.pc-quote{font-family:'Instrument Sans',sans-serif;font-size:11px;color:rgba(0,0,0,.56);font-style:italic;line-height:1.55;max-width:280px}
+.pc-quote b{color:var(--dark);font-style:normal;font-weight:600}
+.pc-cta{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.pc-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:10px 20px;cursor:pointer;transition:all .2s;text-decoration:none;display:block;text-align:center}
+.pc-btn.dk{background:var(--dark);color:var(--cream);border:none}
+.pc-btn.dk:hover{background:#2A2A27}
+.pc-btn.ol{background:transparent;color:var(--dark);border:1px solid rgba(0,0,0,.28)}
+.pc-btn.ol:hover{background:rgba(0,0,0,.07)}
+
+/* mobile contact — stacked */
+@media(max-width:768px){
+  .pc-body{grid-template-columns:1fr;overflow-y:auto}
+  .pc-left{border-right:none;border-bottom:1px solid rgba(255,255,255,.07);padding:28px 22px}
+  .pc-headline{font-size:52px}
+  .pc-right{flex-shrink:0}
+  .pc-map{height:180px;flex:none}
+  .pc-bottom{flex-direction:column;align-items:flex-start;gap:14px}
+  .pc-cta{flex-direction:row}
+}
+</style>
 </head>
 <body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="app">
 
-  <!-- NAVBAR (full-width band, centered content) -->
-  <nav class="navbar">
-    <div class="nav-inner">
-      <div class="nav-left">Inderpreet Kaur</div>
-      <div class="nav-right">
-        <a href="#about">About</a>
-        <a href="#projects">Projects</a>
-        <a href="#experience">Experience</a>
-        <a href="#academics">Academics</a>
-        <a href="#contact" class="nav-cta">Contact</a>
+  <div class="pips">
+    <button class="pip on" onclick="goTo(0)" title="Home"></button>
+    <button class="pip" onclick="goTo(1)" title="Projects"></button>
+    <button class="pip" onclick="goTo(2)" title="Skills"></button>
+    <button class="pip" onclick="goTo(3)" title="About"></button>
+    <button class="pip" onclick="goTo(4)" title="Contact"></button>
+  </div>
+
+  <div id="hint"><p>Scroll · Arrow keys · Swipe</p><i>↓</i></div>
+
+  <!-- ════════ PAGE 1 · HOME ════════ -->
+  <div class="page active" id="ph">
+    <nav>
+      <div class="logo">I<b>K</b></div>
+      <div class="nav-links">
+        <button class="nl on" onclick="goTo(0)">Home</button>
+        <button class="nl" onclick="goTo(1)">Projects</button>
+        <button class="nl" onclick="goTo(2)">Skills</button>
+        <button class="nl" onclick="goTo(3)">About</button>
+        <button class="nl" onclick="goTo(4)">Contact</button>
+      </div>
+      <div class="nav-live"><span class="live-dot"></span><span class="live-txt">Available · Co-op & Internship</span></div>
+      <button class="hamburger" id="hbg" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+      <div class="mob-nav" id="mob-nav">
+        <button class="mob-nl on" onclick="goTo(0);closeMenu()">Home</button>
+        <button class="mob-nl" onclick="goTo(1);closeMenu()">Projects</button>
+        <button class="mob-nl" onclick="goTo(2);closeMenu()">Skills</button>
+        <button class="mob-nl" onclick="goTo(3);closeMenu()">About</button>
+        <button class="mob-nl" onclick="goTo(4);closeMenu()">Contact</button>
+      </div>
+    </nav>
+    <div class="ph-ticker">
+      <div class="tk-inner">
+        <span class="tk-i">React</span><span class="tk-i">Python</span><span class="tk-i">Scikit-Learn</span><span class="tk-i">OpenAI API</span><span class="tk-i">PHP</span><span class="tk-i">MySQL</span><span class="tk-i">Flask</span><span class="tk-i">Random Forest</span><span class="tk-i">TF-IDF</span><span class="tk-i">C#</span><span class="tk-i">Tableau</span><span class="tk-i">Full-Stack</span><span class="tk-i">SQL</span><span class="tk-i">Jupyter</span><span class="tk-i">Agile / Scrum</span><span class="tk-i">Pandas</span><span class="tk-i">NLTK</span><span class="tk-i">Git</span><span class="tk-i">React</span><span class="tk-i">Python</span><span class="tk-i">Scikit-Learn</span><span class="tk-i">OpenAI API</span><span class="tk-i">PHP</span><span class="tk-i">MySQL</span><span class="tk-i">Flask</span><span class="tk-i">Random Forest</span><span class="tk-i">TF-IDF</span><span class="tk-i">C#</span><span class="tk-i">Tableau</span><span class="tk-i">Full-Stack</span><span class="tk-i">SQL</span><span class="tk-i">Jupyter</span><span class="tk-i">Agile / Scrum</span><span class="tk-i">Pandas</span><span class="tk-i">NLTK</span><span class="tk-i">Git</span>
       </div>
     </div>
-  </nav>
-
-  <!-- PAGE CONTENT -->
-  <main class="page-wrap">
-
-    <!-- HERO -->
-    <header class="hero">
-      <div class="hero-inner">
-        <div class="hero-text">
-          <p class="hero-kicker">
-            IT STUDENT · BUILDER · FUTURE DATA / AI PROFESSIONAL
-          </p>
-
-          <h1 class="hero-title">
-            I build practical <span class="accent">web, data, and AI-driven tools.</span>
-          </h1>
-
-          <p class="hero-subtitle">
-            I’m Inderpreet, a BTech IT student at KPU in Surrey, BC. I like turning real
-            problems from work and school into working apps, automations, and databases.
-          </p>
-
-          <p class="hero-meta">
-            Surrey, BC · Canadian Citizen · Open to co-op & internship roles
-          </p>
-
-          <div class="hero-actions">
-            <a href="#projects" class="btn-primary">View projects</a>
-            <a href="resume.pdf" class="btn-ghost" download>Download resume</a>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- ABOUT -->
-    <section id="about" class="section">
-      <h2 class="section-title">About</h2>
-      <div class="two-col">
+    <div class="ph-body">
+      <div class="ph-left">
+        <div class="ph-ghost">KAUR</div>
         <div>
-          <p class="section-text">
-            I’m currently in the <strong>Bachelor of Technology in Information Technology</strong> program at
-            <strong>Kwantlen Polytechnic University</strong>, with a 3.37/4.33 GPA and Dean’s Honour Roll
-            for Fall 2024, Summer 2025 & Fall 2025.
-          </p>
-          <p class="section-text">
-            My focus is on web development, data, and AI, especially projects that connect directly to
-            real operations like finance, construction, or small business workflows.
-          </p>
-          <p class="section-text">
-            Outside coursework, I’ve worked in bookkeeping and administration, which gives me a good sense
-            of how tech needs to behave in actual businesses. I’m fluent in <strong>English, Punjabi, and Hindi</strong>.
-          </p>
+          <div class="ph-eye">BTech IT · KPU Surrey, BC · Portfolio 2026</div>
+          <div class="ph-name"><span class="a">Inder</span>preet<br><span class="o">Kaur.</span></div>
+          <div class="ph-role">Full-Stack Dev · AI/ML Builder · Future Data Engineer</div>
+          <div class="ph-desc">I build <b>practical web, data, and AI-driven tools</b> — from a live React/OpenAI bank analyzer to a <b>completed ML firewall with 92% accuracy</b> and 0 critical false negatives. I also manage <b>$800K–$1.2M/month</b> in financial docs across a <b>$15–$20M project portfolio</b>.</div>
+          <div class="ph-tags">
+            <span class="ph-tag hi">Dean's Honour Roll ×3</span>
+            <span class="ph-tag gr">1 Live App in Production</span>
+            <span class="ph-tag">GPA 3.37 / 4.33</span>
+            <span class="ph-tag">Surrey, BC · Canadian Citizen</span>
+          </div>
+          <div class="ph-cta">
+            <button class="btn-a" onclick="goTo(1)">View Projects →</button>
+            <button class="btn-b" onclick="goTo(4)">Get In Touch</button>
+          </div>
         </div>
+        <div class="ph-foot">Fluent: English · Punjabi · Hindi &nbsp;·&nbsp; Open to co-op & internship</div>
+      </div>
+      <div class="ph-right">
+        <div class="ph-stat"><div class="ph-stat-n">9+</div><div class="ph-stat-l">Projects built</div><div class="ph-stat-s">1 live · 1 in active dev</div></div>
+        <div class="ph-stat"><div class="ph-stat-n">$1.2M</div><div class="ph-stat-l">Monthly financials managed</div><div class="ph-stat-s">$15–20M active portfolio</div></div>
+        <div class="ph-stat"><div class="ph-stat-n">24K</div><div class="ph-stat-l">ML training payloads</div><div class="ph-stat-s">Sentinel AI — 92% accuracy</div></div>
+        <div class="ph-stat"><div class="ph-stat-n">A+</div><div class="ph-stat-l">Advanced Web App Dev</div><div class="ph-stat-s">Dean's Honour Roll ×3</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ PAGE 2 · PROJECTS ════════ -->
+  <div class="page" id="pp">
+    <nav>
+      <div class="logo">I<b>K</b></div>
+      <div class="nav-links">
+        <button class="nl" onclick="goTo(0)">Home</button>
+        <button class="nl on" onclick="goTo(1)">Projects</button>
+        <button class="nl" onclick="goTo(2)">Skills</button>
+        <button class="nl" onclick="goTo(3)">About</button>
+        <button class="nl" onclick="goTo(4)">Contact</button>
+      </div>
+      <div class="nav-live"><span class="live-dot"></span><span class="live-txt">Available 2026</span></div>
+      <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+      <div class="mob-nav">
+        <button class="mob-nl" onclick="goTo(0);closeMenu()">Home</button>
+        <button class="mob-nl on" onclick="goTo(1);closeMenu()">Projects</button>
+        <button class="mob-nl" onclick="goTo(2);closeMenu()">Skills</button>
+        <button class="mob-nl" onclick="goTo(3);closeMenu()">About</button>
+        <button class="mob-nl" onclick="goTo(4);closeMenu()">Contact</button>
+      </div>
+    </nav>
+    <div class="pp-body">
+      <div class="pp-page-header">
+        <div class="pp-page-title">Projects</div>
+        <div class="pp-page-sub">Hover to expand · 9 total</div>
+      </div>
+      <div class="pp-grid">
+
+        <div class="pp-card" onclick="tapCard(this)">
+          <div class="pp-card-bg">01</div>
+          <div class="pp-card-top"><div class="pp-card-type">AI · React · Deployed</div><span class="pp-badge live">Live</span></div>
+          <div class="pp-bar"><div class="pp-bar-fill" style="width:100%"></div></div>
+          <div class="pp-card-title">Spending Spotlight</div>
+          <div class="pp-card-hint">Tap / hover to expand</div>
+          <div class="pp-card-expand">
+            <div class="pp-card-desc">React web app accepting PDF bank statements, <b>classifying transactions via OpenAI API</b> and flagging unexpected spending. Diagnosed real-world noise from Chase statement injection and engineered pattern filtering end-to-end.</div>
+            <div class="pp-stack"><span class="pp-tech">React</span><span class="pp-tech">JavaScript</span><span class="pp-tech">OpenAI API</span><span class="pp-tech">Python</span><span class="pp-tech">Vercel</span></div>
+            <a href="https://spending-spotlight.vercel.app/" class="pp-link" target="_blank">Live demo ↗</a>
+          </div>
+        </div>
+
+        <div class="pp-card" onclick="tapCard(this)">
+          <div class="pp-card-bg">02</div>
+          <div class="pp-card-top"><div class="pp-card-type">AI · ML · Cybersecurity</div><span class="pp-badge live">Complete</span></div>
+          <div class="pp-bar"><div class="pp-bar-fill" style="width:100%"></div></div>
+          <div class="pp-card-title">Sentinel AI — Web Firewall</div>
+          <div class="pp-card-hint">Tap / hover to expand</div>
+          <div class="pp-card-expand">
+            <div class="pp-card-desc"><b>92% accuracy, 0 critical false negatives</b> across SQL injection, XSS, and OS command injection. Random Forest Classifier on 24,161 labeled payloads using character-level TF-IDF n-gram vectorization (n=1–4, 80K features). Detects mixed-case SQL obfuscation at confidence 1.00. Autonomous Python engine blacklists IPs in MySQL with zero human intervention across a 50+ page PHP MVC app.</div>
+            <div class="pp-stack"><span class="pp-tech">Python</span><span class="pp-tech">Scikit-Learn</span><span class="pp-tech">PHP</span><span class="pp-tech">MySQL</span><span class="pp-tech">Java / JUnit 5</span><span class="pp-tech">TF-IDF</span></div>
+            <a href="https://github.com/inderpreet-k/sentinel-ai" class="pp-link" target="_blank">GitHub ↗</a>
+          </div>
+        </div>
+
+        <div class="pp-card" onclick="tapCard(this)">
+          <div class="pp-card-bg">03</div>
+          <div class="pp-card-top"><div class="pp-card-type">AI · Python · NLP</div><span class="pp-badge arch">Solo</span></div>
+          <div class="pp-bar"><div class="pp-bar-fill" style="width:88%"></div></div>
+          <div class="pp-card-title">Text-to-SQL Generator</div>
+          <div class="pp-card-hint">Tap / hover to expand</div>
+          <div class="pp-card-expand">
+            <div class="pp-card-desc">Loads CSV into SQLite, accepts natural-language questions, generates and executes SQL via GPT. Strict prompt constraints (temp=0, regex post-processing) ensure only valid SELECT statements reach the DB.</div>
+            <div class="pp-stack"><span class="pp-tech">Python</span><span class="pp-tech">SQLite</span><span class="pp-tech">OpenAI API</span><span class="pp-tech">Jupyter</span></div>
+            <a href="https://colab.research.google.com/drive/1X08TA_YIJ_Zq53ScqMiCC7u15RvJ8J_g" class="pp-link" target="_blank">Open notebook ↗</a>
+            <div class="an-panel">
+              <div class="an-label">Query success rate — self-tested</div>
+              <div class="an-bar-row"><span class="an-bar-name">Simple SELECT</span><div class="an-bar-track"><div class="an-bar-fill green" style="width:92%"></div></div><span class="an-bar-val">92%</span></div>
+              <div class="an-bar-row"><span class="an-bar-name">Filtered WHERE</span><div class="an-bar-track"><div class="an-bar-fill green" style="width:85%"></div></div><span class="an-bar-val">85%</span></div>
+              <div class="an-bar-row"><span class="an-bar-name">Aggregations</span><div class="an-bar-track"><div class="an-bar-fill" style="width:70%"></div></div><span class="an-bar-val">70%</span></div>
+              <div class="an-bar-row"><span class="an-bar-name">Complex JOINs</span><div class="an-bar-track"><div class="an-bar-fill dim" style="width:38%"></div></div><span class="an-bar-val">38%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pp-card" onclick="tapCard(this)">
+          <div class="pp-card-bg">04</div>
+          <div class="pp-card-top"><div class="pp-card-type">NLP · IR · Flask</div><span class="pp-badge team">Team of 4</span></div>
+          <div class="pp-bar"><div class="pp-bar-fill" style="width:100%"></div></div>
+          <div class="pp-card-title">Recipe Search Engine</div>
+          <div class="pp-card-hint">Tap / hover to expand</div>
+          <div class="pp-card-expand">
+            <div class="pp-card-desc">Two-stage IR system extending TF-IDF with multi-factor personalization. <b>My contribution:</b> problem framing, TF-IDF limitation analysis, two-stage architecture proposal, preprocessing pipelines, Precision@10 evaluation.</div>
+            <div class="pp-stack"><span class="pp-tech">Python</span><span class="pp-tech">NLTK</span><span class="pp-tech">Flask</span><span class="pp-tech">TF-IDF</span><span class="pp-tech">Cosine Similarity</span></div>
+            <div class="an-panel">
+              <div class="an-label">Corpus scale · INFO 4105 · KPU</div>
+              <div class="an-stats-row">
+                <div class="an-stat"><div class="an-stat-n">13.5K</div><div class="an-stat-l">Recipes</div></div>
+                <div class="an-stat"><div class="an-stat-n">1.28M</div><div class="an-stat-l">Postings</div></div>
+                <div class="an-stat"><div class="an-stat-n">41%</div><div class="an-stat-l">Index cut</div></div>
+                <div class="an-stat"><div class="an-stat-n">&lt;500ms</div><div class="an-stat-l">Query</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pp-card" onclick="tapCard(this)">
+          <div class="pp-card-bg">05</div>
+          <div class="pp-card-top"><div class="pp-card-type">Full Stack · Backend Lead</div><span class="pp-badge team">Team</span></div>
+          <div class="pp-bar"><div class="pp-bar-fill" style="width:100%"></div></div>
+          <div class="pp-card-title">Catering Management System</div>
+          <div class="pp-card-hint">Tap / hover to expand</div>
+          <div class="pp-card-expand">
+            <div class="pp-card-desc">Full-stack system with separate portals for admin, staff and customers. Led backend architecture and relational schema design — coordinated front-end integration across the team.</div>
+            <div class="pp-stack"><span class="pp-tech">PHP</span><span class="pp-tech">MySQL</span><span class="pp-tech">XAMPP</span><span class="pp-tech">HTML/CSS</span></div>
+            <a href="https://github.com/inderpreet-k/catering-management-system" class="pp-link" target="_blank">GitHub + demo ↗</a>
+          </div>
+        </div>
+
+        <div class="pp-card" onclick="tapCard(this)">
+          <div class="pp-card-bg">06</div>
+          <div class="pp-card-top"><div class="pp-card-type">Full Stack · Team</div><span class="pp-badge arch">Contributor</span></div>
+          <div class="pp-bar"><div class="pp-bar-fill" style="width:80%"></div></div>
+          <div class="pp-card-title">Stock Management App</div>
+          <div class="pp-card-hint">Tap / hover to expand</div>
+          <div class="pp-card-expand">
+            <div class="pp-card-desc">Inventory management prototype with secure login and structured data handling. Contributed database logic and data flow architecture.</div>
+            <div class="pp-stack"><span class="pp-tech">HTML</span><span class="pp-tech">CSS</span><span class="pp-tech">JavaScript</span><span class="pp-tech">MySQL</span></div>
+            <a href="https://github.com/gitBerkayS/stock-management-application" class="pp-link" target="_blank">GitHub ↗</a>
+          </div>
+        </div>
+
+        <div class="pp-card" onclick="tapCard(this)">
+          <div class="pp-card-bg">07</div>
+          <div class="pp-card-top"><div class="pp-card-type">Database · SQL</div><span class="pp-badge arch">Solo</span></div>
+          <div class="pp-bar"><div class="pp-bar-fill" style="width:100%"></div></div>
+          <div class="pp-card-title">Parking Meter Database</div>
+          <div class="pp-card-hint">Tap / hover to expand</div>
+          <div class="pp-card-expand">
+            <div class="pp-card-desc">Relational database for parking violations — ERD design, normalized schema, and SQL reporting queries for violation tracking and clean-up workflows.</div>
+            <div class="pp-stack"><span class="pp-tech">SQL</span><span class="pp-tech">ERD Design</span><span class="pp-tech">Relational Schema</span></div>
+          </div>
+        </div>
+
+        <div class="pp-card" onclick="tapCard(this)">
+          <div class="pp-card-bg">08</div>
+          <div class="pp-card-top"><div class="pp-card-type">SaaS · In Development</div><span class="pp-badge wip">Building</span></div>
+          <div class="pp-bar"><div class="pp-bar-fill" style="width:20%"></div></div>
+          <div class="pp-card-title">MyProjectNest</div>
+          <div class="pp-card-hint">Tap / hover to expand</div>
+          <div class="pp-card-expand">
+            <div class="pp-card-desc">Academic project hub for students — store, share, and discover projects with QR-code sharing and AI-powered indexing for fast search.</div>
+            <div class="pp-stack"><span class="pp-tech">Concept</span><span class="pp-tech">UX</span><span class="pp-tech">AI Indexing</span></div>
+          </div>
+        </div>
+
+        <div class="pp-card" onclick="tapCard(this)">
+          <div class="pp-card-bg">09</div>
+          <div class="pp-card-top"><div class="pp-card-type">Game · Educational</div><span class="pp-badge arch">Solo</span></div>
+          <div class="pp-bar"><div class="pp-bar-fill" style="width:100%"></div></div>
+          <div class="pp-card-title">Shape & Color Catcher</div>
+          <div class="pp-card-hint">Tap / hover to expand</div>
+          <div class="pp-card-expand">
+            <div class="pp-card-desc">Educational game for kids — catch falling shapes and sort by color to make shape and colour recognition interactive and fun.</div>
+            <div class="pp-stack"><span class="pp-tech">Processing</span><span class="pp-tech">Java</span></div>
+            <a href="https://github.com/inderpreet-k/shape-Catching-and-Color-sorting" class="pp-link" target="_blank">GitHub ↗</a>
+            <a href="https://youtu.be/r7MFN_UnLB8" class="pp-link" target="_blank">Watch demo ↗</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- HEATMAP -->
+      <div class="pp-heatmap">
+        <div class="pp-heatmap-title">Stack fingerprint — technology depth across all projects</div>
+        <div class="hm-header-row">
+          <span class="hm-tech-lbl">React</span><span class="hm-tech-lbl">Python</span><span class="hm-tech-lbl">PHP</span><span class="hm-tech-lbl">MySQL</span><span class="hm-tech-lbl">OpenAI</span><span class="hm-tech-lbl">Scikit</span><span class="hm-tech-lbl">NLTK</span><span class="hm-tech-lbl">Flask</span><span class="hm-tech-lbl">SQL</span><span class="hm-tech-lbl">Java</span><span class="hm-tech-lbl">HTML/CSS</span>
+        </div>
+        <div class="hm-row"><span class="hm-proj-name">Spending Spotlight</span><div class="hm-cell hm-3"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-2"></div></div>
+        <div class="hm-row"><span class="hm-proj-name">Sentinel AI</span><div class="hm-cell hm-0"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-0"></div></div>
+        <div class="hm-row"><span class="hm-proj-name">Text-to-SQL</span><div class="hm-cell hm-0"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div></div>
+        <div class="hm-row"><span class="hm-proj-name">Recipe Search</span><div class="hm-cell hm-0"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div></div>
+        <div class="hm-row"><span class="hm-proj-name">Catering System</span><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-2"></div></div>
+        <div class="hm-row"><span class="hm-proj-name">Stock Mgmt</span><div class="hm-cell hm-1"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-3"></div></div>
+        <div class="hm-row"><span class="hm-proj-name">Parking Meter DB</span><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-0"></div><div class="hm-cell hm-0"></div></div>
+        <div class="hm-footer">
+          <span class="hm-legend-lbl">Not used</span>
+          <div class="hm-legend-cell hm-0"></div><div class="hm-legend-cell hm-1"></div><div class="hm-legend-cell hm-2"></div><div class="hm-legend-cell hm-3"></div>
+          <span class="hm-legend-lbl">Core</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ PAGE 3 · SKILLS ════════ -->
+  <div class="page" id="psk">
+    <nav>
+      <div class="logo">I<b>K</b></div>
+      <div class="nav-links">
+        <button class="nl" onclick="goTo(0)">Home</button>
+        <button class="nl" onclick="goTo(1)">Projects</button>
+        <button class="nl on" onclick="goTo(2)">Skills</button>
+        <button class="nl" onclick="goTo(3)">About</button>
+        <button class="nl" onclick="goTo(4)">Contact</button>
+      </div>
+      <div class="nav-live"><span class="live-dot"></span><span class="live-txt">Available 2026</span></div>
+      <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+      <div class="mob-nav">
+        <button class="mob-nl" onclick="goTo(0);closeMenu()">Home</button>
+        <button class="mob-nl" onclick="goTo(1);closeMenu()">Projects</button>
+        <button class="mob-nl on" onclick="goTo(2);closeMenu()">Skills</button>
+        <button class="mob-nl" onclick="goTo(3);closeMenu()">About</button>
+        <button class="mob-nl" onclick="goTo(4);closeMenu()">Contact</button>
+      </div>
+    </nav>
+    <div class="psk-body">
+      <div class="psk-side">
+        <span class="psk-side-lbl">Technical stack</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(255,255,255,.1);line-height:1">SK</span>
+        <span class="psk-side-lbl">Skills</span>
+      </div>
+      <div class="psk-main">
+        <div class="psk-header">
+          <div class="psk-header-title">Technical Skills</div>
+          <div class="psk-header-sub">Languages · Frameworks · AI/ML · Tools · Concepts</div>
+        </div>
+        <div class="psk-cols">
+          <!-- COL 1 -->
+          <div class="psk-col">
+            <div class="psk-group">
+              <div class="psk-group-label">Languages</div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">Python</span><span class="psk-item-level">Advanced</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:88%;width:88%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">JavaScript</span><span class="psk-item-level">Advanced</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:85%;width:85%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">PHP</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:78%;width:78%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">SQL</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:80%;width:80%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">Java</span><span class="psk-item-level">Familiar</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:60%;width:60%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">C#</span><span class="psk-item-level">Familiar</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:58%;width:58%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">HTML / CSS</span><span class="psk-item-level">Advanced</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:90%;width:90%"></div></div></div>
+            </div>
+            <div class="psk-group">
+              <div class="psk-group-label">Frameworks & Runtime</div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">React</span><span class="psk-item-level">Advanced</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:84%;width:84%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">Flask</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:72%;width:72%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">MySQL / SQLite</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:80%;width:80%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">XAMPP</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:75%;width:75%"></div></div></div>
+            </div>
+          </div>
+          <!-- COL 2 -->
+          <div class="psk-col">
+            <div class="psk-group">
+              <div class="psk-group-label">AI / ML</div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">OpenAI API Integration</span><span class="psk-item-level">Advanced</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:88%;width:88%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">Scikit-Learn</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:70%;width:70%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">Random Forest Classifier</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:68%;width:68%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">TF-IDF Vectorization</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:72%;width:72%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">Prompt Engineering</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:78%;width:78%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">NLTK</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:68%;width:68%"></div></div></div>
+              <div class="psk-item"><div class="psk-item-top"><span class="psk-item-name">Pandas</span><span class="psk-item-level">Proficient</span></div><div class="psk-bar-track"><div class="psk-bar-fill" style="--w:70%;width:70%"></div></div></div>
+            </div>
+            <div class="psk-group">
+              <div class="psk-group-label">Data & Concepts</div>
+              <div class="psk-pill-group">
+                <span class="psk-pill hi">N-Gram Analysis</span><span class="psk-pill hi">Cosine Similarity</span><span class="psk-pill hi">Inverted Index</span><span class="psk-pill">Boolean Retrieval</span><span class="psk-pill">ERD & Relational Design</span><span class="psk-pill">CSV-to-DB Pipelines</span><span class="psk-pill">Jupyter / Colab</span>
+              </div>
+            </div>
+          </div>
+          <!-- COL 3 -->
+          <div class="psk-col">
+            <div class="psk-group">
+              <div class="psk-group-label">Dev Tools</div>
+              <div class="psk-pill-group">
+                <span class="psk-pill hi">Git</span><span class="psk-pill hi">Vercel</span><span class="psk-pill">Tableau</span><span class="psk-pill">WordPress</span><span class="psk-pill">Wix</span><span class="psk-pill">QuickBooks</span>
+              </div>
+            </div>
+            <div class="psk-group">
+              <div class="psk-group-label">Engineering Concepts</div>
+              <div class="psk-pill-group">
+                <span class="psk-pill hi">Agile / Scrum</span><span class="psk-pill hi">SDLC</span><span class="psk-pill hi">Black-Box Security Testing</span><span class="psk-pill">Automated SQA</span><span class="psk-pill">Information Retrieval</span><span class="psk-pill">Object-Oriented Design</span><span class="psk-pill">Project Management</span>
+              </div>
+            </div>
+            <div class="psk-group">
+              <div class="psk-group-label">Certifications</div>
+              <div class="psk-cert"><div class="psk-cert-title">Google Digital Marketing & E-Commerce</div><div class="psk-cert-org">Google · Coursera</div></div>
+              <div class="psk-cert"><div class="psk-cert-title">Financial Accounting & Fundamentals</div><div class="psk-cert-org">Coursera</div></div>
+            </div>
+            <div class="psk-group">
+              <div class="psk-group-label">Currently studying</div>
+              <div class="psk-pill-group">
+                <span class="psk-pill hi">Mobile Web Development</span><span class="psk-pill hi">Software Quality Assurance</span><span class="psk-pill hi">Project Integration 1</span><span class="psk-pill hi">Advanced Web & Mobile Dev</span>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:rgba(255,255,255,.2);letter-spacing:1px;margin-top:8px;font-style:italic">Current & upcoming semester · KPU 2025–26</div>
+            </div>
+          </div>
+        </div>
+        <!-- RADAR -->
+        <div class="radar-section">
+          <div class="radar-wrap">
+            <svg width="148" height="148" viewBox="0 0 148 148">
+              <defs><style>.rg{stroke:rgba(255,255,255,.06);stroke-width:.5;fill:none}.rl{stroke:rgba(255,255,255,.08);stroke-width:.5}.rf{fill:rgba(193,125,60,.18);stroke:rgba(193,125,60,.7);stroke-width:1.5}.rax{font-family:'IBM Plex Mono',monospace;font-size:7px;fill:rgba(255,255,255,.3);text-anchor:middle}</style></defs>
+              <polygon class="rg" points="74,44 98,58 98,86 74,100 50,86 50,58"/>
+              <polygon class="rg" points="74,33 110,54 110,94 74,115 38,94 38,54"/>
+              <polygon class="rg" points="74,22 122,50 122,98 74,126 26,98 26,50"/>
+              <line class="rl" x1="74" y1="74" x2="74" y2="16"/><line class="rl" x1="74" y1="74" x2="124" y2="45"/><line class="rl" x1="74" y1="74" x2="124" y2="103"/><line class="rl" x1="74" y1="74" x2="74" y2="132"/><line class="rl" x1="74" y1="74" x2="24" y2="103"/><line class="rl" x1="74" y1="74" x2="24" y2="45"/>
+              <polygon class="rf" points="74,24 118,49 116,101 74,128 32,96 30,50"/>
+              <text class="rax" x="74" y="11">Frontend</text><text class="rax" x="136" y="47">Backend</text><text class="rax" x="136" y="109">AI / ML</text><text class="rax" x="74" y="143">Data / IR</text><text class="rax" x="12" y="109">Security</text><text class="rax" x="12" y="47">Biz Ops</text>
+              <circle cx="74" cy="74" r="3" fill="rgba(193,125,60,.6)"/>
+            </svg>
+          </div>
+          <div>
+            <div class="radar-legend">
+              <div class="radar-legend-item"><span class="radar-legend-dot"></span><span class="radar-legend-name">Frontend (React, HTML/CSS, JS)</span><span class="radar-legend-val">88</span></div>
+              <div class="radar-legend-item"><span class="radar-legend-dot"></span><span class="radar-legend-name">Backend (PHP, MySQL, Flask)</span><span class="radar-legend-val">80</span></div>
+              <div class="radar-legend-item"><span class="radar-legend-dot"></span><span class="radar-legend-name">AI / ML (OpenAI, Scikit, RF)</span><span class="radar-legend-val">82</span></div>
+              <div class="radar-legend-item"><span class="radar-legend-dot"></span><span class="radar-legend-name">Data / IR (TF-IDF, SQL, NLTK)</span><span class="radar-legend-val">75</span></div>
+              <div class="radar-legend-item"><span class="radar-legend-dot"></span><span class="radar-legend-name">Security (Black-box, SQLi testing)</span><span class="radar-legend-val">65</span></div>
+              <div class="radar-legend-item"><span class="radar-legend-dot"></span><span class="radar-legend-name">Business Operations</span><span class="radar-legend-val">90</span></div>
+            </div>
+            <div class="radar-note">Self-assessed · honest · out of 100</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ PAGE 4 · ABOUT ════════ -->
+  <div class="page" id="pa">
+    <nav>
+      <div class="logo">I<b>K</b></div>
+      <div class="nav-links">
+        <button class="nl" onclick="goTo(0)">Home</button>
+        <button class="nl" onclick="goTo(1)">Projects</button>
+        <button class="nl" onclick="goTo(2)">Skills</button>
+        <button class="nl on" onclick="goTo(3)">About</button>
+        <button class="nl" onclick="goTo(4)">Contact</button>
+      </div>
+      <div class="nav-live"><span class="live-dot"></span><span class="live-txt">Available 2026</span></div>
+      <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+      <div class="mob-nav">
+        <button class="mob-nl" onclick="goTo(0);closeMenu()">Home</button>
+        <button class="mob-nl" onclick="goTo(1);closeMenu()">Projects</button>
+        <button class="mob-nl" onclick="goTo(2);closeMenu()">Skills</button>
+        <button class="mob-nl on" onclick="goTo(3);closeMenu()">About</button>
+        <button class="mob-nl" onclick="goTo(4);closeMenu()">Contact</button>
+      </div>
+    </nav>
+    <div class="pa-body">
+      <div class="pa-left">
+        <div class="pa-sec-lbl">About me</div>
+        <div class="pa-big">Who I am.</div>
+        <p class="pa-txt">I'm <b>Inderpreet Kaur</b> — BTech IT student at <b>Kwantlen Polytechnic University</b>, Surrey BC. I focus on full-stack development, machine learning, and AI. I don't build for coursework alone — real problems genuinely drive me.<br><br>My background in finance and operations across construction, immigration, and retail gives me something rare: I understand how software needs to behave inside an actual business.</p>
+        <div class="pa-divider"></div>
+        <div class="pa-sec-lbl">Experience</div>
+        <div class="pa-exp-row">
+          <div class="pa-yr">25</div>
+          <div><div class="pa-co">Nexgen Electrical Ltd. <span class="pa-now">Now</span></div><div class="pa-role">Office Administrator / Bookkeeper · White Rock, BC<br><b>$800K–$1.2M/month</b> in invoices, SOVs & POs · <b>$15–$20M</b> portfolio · Payroll 30+ employees · QuickBooks</div></div>
+        </div>
+        <div class="pa-exp-row">
+          <div class="pa-yr">23</div>
+          <div><div class="pa-co">Element Immigration Inc.</div><div class="pa-role">Office Assistant / Bookkeeper · 50–150 active CRM files · Financial reconciliations · WordPress & Wix</div></div>
+        </div>
+        <div class="pa-exp-row">
+          <div class="pa-yr">21</div>
+          <div><div class="pa-co">Enfield Solutions Inc.</div><div class="pa-role">Bookkeeper · Full-cycle bookkeeping · GST & corporate filings · Payroll</div></div>
+        </div>
+        <div class="pa-exp-row">
+          <div class="pa-yr">19</div>
+          <div><div class="pa-co">Dollar Up</div><div class="pa-role">Store Supervisor · Staff scheduling · Inventory management · Cash operations</div></div>
+        </div>
+      </div>
+      <div class="pa-right">
+        <div class="pa-awards">
+          <div class="pa-awards-lbl">Academic achievements</div>
+          <div class="pa-award-grid">
+            <div class="pa-award"><div class="pa-award-n">×3</div><div class="pa-award-l">Dean's Honour Roll<br>Fall '24 · Sum '25 · Fall '25</div></div>
+            <div class="pa-award"><div class="pa-award-n">3.37</div><div class="pa-award-l">GPA / 4.33<br>BTech IT · KPU</div></div>
+            <div class="pa-award"><div class="pa-award-n">A+</div><div class="pa-award-l">Advanced Web App Dev<br>+ 5 more A-range courses</div></div>
+            <div class="pa-award"><div class="pa-award-n">2027</div><div class="pa-award-l">Expected graduation<br>BTech IT · KPU Surrey</div></div>
+          </div>
+        </div>
+        <div class="pa-edu">
+          <div class="pa-edu-lbl">Education</div>
+          <div class="pa-edu-item">
+            <div class="pa-edu-deg">Bachelor of Technology — Information Technology</div>
+            <div class="pa-edu-school">KPU · Surrey, BC · Expected 2027</div>
+            <div class="pa-edu-detail"><b>Relevant courses:</b> Advanced Web App Dev (A+) · Data Warehousing & Mining (A) · Search Engine Principles (A−) · Software QA · Project Management (A−) · OO Software Engineering (Agile) · Database Systems · Statistics</div>
+          </div>
+          <div class="pa-edu-item">
+            <div class="pa-edu-deg">Diploma — Computer Information Systems</div>
+            <div class="pa-edu-school">KPU · Surrey, BC · 2021</div>
+            <div class="pa-edu-detail">Foundation in systems, databases, and programming.</div>
+          </div>
+        </div>
+        <div class="pa-langs">
+          <div class="pa-langs-lbl">Languages spoken</div>
+          <div class="pa-lang-row">
+            <span class="pa-lang"><b>English</b> — Fluent</span>
+            <span class="pa-lang"><b>Punjabi</b> — Native</span>
+            <span class="pa-lang"><b>Hindi</b> — Fluent</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ PAGE 5 · CONTACT ════════ -->
+  <div class="page" id="pc">
+    <nav>
+      <div class="logo">I<b>K</b></div>
+      <div class="nav-links">
+        <button class="nl" onclick="goTo(0)">Home</button>
+        <button class="nl" onclick="goTo(1)">Projects</button>
+        <button class="nl" onclick="goTo(2)">Skills</button>
+        <button class="nl" onclick="goTo(3)">About</button>
+        <button class="nl on" onclick="goTo(4)">Contact</button>
+      </div>
+      <div class="nav-live"><span class="live-dot"></span><span class="live-txt">Available 2026</span></div>
+      <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+      <div class="mob-nav">
+        <button class="mob-nl" onclick="goTo(0);closeMenu()">Home</button>
+        <button class="mob-nl" onclick="goTo(1);closeMenu()">Projects</button>
+        <button class="mob-nl" onclick="goTo(2);closeMenu()">Skills</button>
+        <button class="mob-nl" onclick="goTo(3);closeMenu()">About</button>
+        <button class="mob-nl on" onclick="goTo(4);closeMenu()">Contact</button>
+      </div>
+    </nav>
+    <div class="pc-body">
+      <div class="pc-left">
         <div>
-          <p class="section-label small">Core stack</p>
-          <div class="chips-group">
-            <span class="chip">HTML / CSS / JS</span>
-            <span class="chip">PHP & MySQL</span>
-            <span class="chip">C#</span>
-            <span class="chip">Python (Jupyter, AI APIs)</span>
-            <span class="chip">SQL & Data</span>
+          <div class="pc-eyebrow">Got a role, a project, or just want to talk tech?</div>
+          <div class="pc-headline">I'm<br><span class="a">All</span><br><span class="o">Ears.</span></div>
+          <div class="pc-sub">See something you like? <em>Let's talk.</em><br><br>I'm open to <b>co-op placements, internships</b>, and collaborations in web, data, or AI. I reply fast, I ask good questions, and I show up ready to build.</div>
+        </div>
+        <div class="pc-links">
+          <div class="pc-row" onclick="window.location='mailto:inderpreetkaur762@gmail.com'">
+            <div><div class="pc-row-lbl">Email</div><div class="pc-row-val">inderpreetkaur762@gmail.com</div></div><span class="pc-arr">→</span>
           </div>
-          <p class="section-label small mt-16">Tools</p>
-          <div class="chips-group">
-            <span class="chip">QuickBooks</span>
-            <span class="chip">Tableau</span>
-            <span class="chip">WordPress</span>
-            <span class="chip">Wix</span>
+          <div class="pc-row" onclick="window.location='tel:17783254020'">
+            <div><div class="pc-row-lbl">Phone</div><div class="pc-row-val">+1 (778) 325-4020</div></div><span class="pc-arr">→</span>
+          </div>
+          <div class="pc-row" onclick="window.open('https://linkedin.com/in/inderpreet-kaur29')">
+            <div><div class="pc-row-lbl">LinkedIn</div><div class="pc-row-val">linkedin.com/in/inderpreet-kaur29</div></div><span class="pc-arr">→</span>
+          </div>
+          <div class="pc-row" onclick="window.open('https://github.com/inderpreet-k')">
+            <div><div class="pc-row-lbl">GitHub</div><div class="pc-row-val">github.com/inderpreet-k</div></div><span class="pc-arr">→</span>
+          </div>
+          <div class="pc-row" onclick="window.open('https://inderpreet-k.github.io')">
+            <div><div class="pc-row-lbl">Portfolio</div><div class="pc-row-val">inderpreet-k.github.io</div></div><span class="pc-arr">→</span>
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section id="projects" class="section">
-      <h2 class="section-title">Projects</h2>
-      <p class="section-subtitle">
-        Proof-linked work at the top, followed by in-progress and earlier builds.
-      </p>
-
-      <div class="card-grid">
-
-        <!-- Spending Spotlight -->
-        <article class="card">
-          <p class="card-tag">Featured · Live</p>
-          <h3>Spending Spotlight, AI Bank Statement Analyzer (2025)</h3>
-          <p>
-            Web app that analyses bank statements, classifies transactions, flags anomalies, and visualizes
-            spending using OpenAI APIs.
-          </p>
-          <p class="card-meta">JavaScript · React · AI API</p>
-          <div class="card-actions">
-            <a href="https://spending-spotlight.vercel.app/" target="_blank" rel="noopener" class="card-link">Live demo ↗</a>
+      <div class="pc-right">
+        <div class="pc-map">
+          <div class="pc-grid-bg"></div>
+          <div class="pc-pin">
+            <div class="pc-pin-ring"><div class="pc-pin-dot"></div></div>
+            <div class="pc-city">Surrey, BC</div>
+            <div class="pc-city-sub">Canada · Open to remote & hybrid</div>
           </div>
-        </article>
-
-        <!-- Text-to-SQL -->
-        <article class="card">
-          <p class="card-tag">AI / Data</p>
-          <h3>AI-Powered Text-to-SQL Query Generator (2025, KPU)</h3>
-          <p>
-            Jupyter Notebook prototype that turns natural-language questions into SQL queries using GPT-style APIs,
-            aimed at non-technical users exploring relational databases.
-          </p>
-          <p class="card-meta">Python · SQL · Jupyter · AI API</p>
-          <div class="card-actions">
-            <a href="https://colab.research.google.com/drive/1X08TA_YIJ_Zq53ScqMiCC7u15RvJ8J_g?usp=sharing" target="_blank" rel="noopener" class="card-link">Open notebook ↗</a>
-          </div>
-        </article>
-
-        <!-- Shape catching -->
-        <article class="card">
-          <p class="card-tag">Game · Visual</p>
-          <h3>Shape-Catching and Color Catching Game for Kids (2025, KPU)</h3>
-          <p>
-            Small educational game in Processing where kids catch falling shapes and then sort catched shape in different colors, designed to make colour
-            and shape recognition more fun and interactive.
-          </p>
-          <p class="card-meta">Processing · Java</p>
-          <div class="card-actions">
-            <a href="https://github.com/inderpreet-k/shape-Catching-and-Color-sorting" target="_blank" class="card-link">GitHub repo ↗</a>
-            <a href="https://youtu.be/r7MFN_UnLB8" target="_blank" class="card-link">Watch demo ↗</a>
-          </div>
-        </article>
-
-        <!-- Catering -->
-        <article class="card">
-          <p class="card-tag subtle">Course project · Full Stack</p>
-          <h3>Catering Management System</h3>
-          <p>
-            Full-stack PHP/MySQL system with separate portals for admin, staff, and customers. I’m currently
-            leading backend and database work.
-          </p>
-          <p class="card-meta">PHP · MySQL · XAMPP</p>
-          <div class="card-actions">
-            <a href="https://github.com/inderpreet-k/catering-management-system" target="_blank" class="card-link">GitHub repo ↗</a>
-            <a href="https://youtu.be/SKfp7fXksZE" target="_blank" class="card-link">Watch demo ↗</a>
-          </div>
-        </article>
-
-        <!-- Parking meter -->
-        <article class="card">
-          <p class="card-tag">Database</p>
-          <h3>Parking Meter Database Project (2020, KPU)</h3>
-          <p>
-            Relational database for parking violations with ERD, schema design, and query set for reporting and
-            clean-up tasks.
-          </p>
-          <p class="card-meta">SQL · ERD · Relational design</p>
-          <div class="card-actions">
-            <a href="https://kpuemp-my.sharepoint.com/:b:/g/personal/inderpreetkaur2_student_kpu_ca/EQXR6NB70odNoQTqbw4YNwgBd_azZ3_QAhLaZAUE1QkWzg?e=Y2dPEy" target="_blank" rel="noopener" class="card-link">View report (PDF) ↗</a>
-          </div>
-        </article>
-
-        <!-- Stock management -->
-        <article class="card">
-          <p class="card-tag">Team project</p>
-          <h3>Stock Management Website Prototype (2025, KPU)</h3>
-          <p>
-            Inventory management prototype with secure login and structured data handling, built as a team project.
-            I contributed to database logic and flows.
-          </p>
-          <p class="card-meta">HTML · CSS · JavaScript · MySQL</p>
-          <div class="card-actions">
-            <a href="https://github.com/gitBerkayS/stock-management-application" target="_blank" rel="noopener" class="card-link">GitHub repo ↗</a>
-          </div>
-        </article>
-
-
-        <!-- Postomatic -->
-        <article class="card">
-          <p class="card-tag subtle">Product · In development</p>
-          <h3>Postomatic Pro: AI Social Media Automation</h3>
-          <p>
-            A tool for small businesses and freelancers to connect accounts, set preferences, and let AI
-            generate and schedule posts automatically.
-          </p>
-          <p class="card-meta">Concept · Prompt design · Automation</p>
-          <p class="chip-inline">In development — details coming soon</p>
-        </article>
-
-        <!-- MyProjectNest -->
-        <article class="card">
-          <p class="card-tag subtle">Product · In development</p>
-          <h3>MyProjectNest: Academic Project Hub</h3>
-          <p>
-            A central space for students to store and share academic projects, with QR-code sharing and
-            AI-powered indexing for fast search.
-          </p>
-          <p class="card-meta">SaaS concept · UX · Information architecture</p>
-          <p class="chip-inline">In development — details coming soon</p>
-        </article>
-
-        <!-- Order management -->
-        <article class="card">
-          <p class="card-tag subtle">Archive</p>
-          <h3>Online Order Management System (2021, KPU)</h3>
-          <p>
-            Early e-commerce style system built with HTML/CSS/PHP and a live MySQL backend to handle basic
-            orders and inventory.
-          </p>
-          <p class="card-meta">Web fundamentals · PHP · MySQL</p>
-          <p class="card-note">Archived project — code available on request.</p>
-        </article>
-
-      </div>
-    </section>
-
-    <!-- EXPERIENCE -->
-    <section id="experience" class="section">
-      <h2 class="section-title">Experience</h2>
-      <div class="timeline">
-        <article class="timeline-item">
-          <div class="timeline-header">
-            <h3>Nexgen Electrical Ltd.</h3>
-            <span class="timeline-date">Mar 2025 – Present · Surrey, BC</span>
-          </div>
-          <p class="timeline-role">Office Administrator / Bookkeeper</p>
-          <ul>
-            <li>Payroll for 30+ employees, invoicing, and project documents (SOVs, POs, work orders).</li>
-            <li>Coordination with field staff and inspectors across multiple electrical projects.</li>
-            <li>QuickBooks record-keeping and inspection/compliance scheduling.</li>
-          </ul>
-        </article>
-
-        <article class="timeline-item">
-          <div class="timeline-header">
-            <h3>Element Immigration Inc.</h3>
-            <span class="timeline-date">May 2023 – Mar 2025 · White Rock, BC</span>
-          </div>
-          <p class="timeline-role">Office Assistant / Bookkeeper</p>
-          <ul>
-            <li>Client communication, case documentation, and financial reconciliations.</li>
-            <li>Updated WordPress/Wix content and helped publish informational blog posts.</li>
-          </ul>
-        </article>
-
-        <article class="timeline-item">
-          <div class="timeline-header">
-            <h3>Enfield Solutions Inc.</h3>
-            <span class="timeline-date">Aug 2021 – May 2023 · White Rock, BC</span>
-          </div>
-          <p class="timeline-role">Bookkeeper</p>
-          <ul>
-            <li>Processed payroll and supported bookkeeping and tax filings for a small business.</li>
-          </ul>
-        </article>
-
-        <article class="timeline-item">
-          <div class="timeline-header">
-            <h3>Dollar Up</h3>
-            <span class="timeline-date">Oct 2019 – Oct 2023 · Surrey, BC</span>
-          </div>
-          <p class="timeline-role">Store Supervisor</p>
-          <ul>
-            <li>Supervised daily retail operations, staff scheduling, and inventory management.</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <!-- ACADEMICS -->
-    <section id="academics" class="section">
-      <h2 class="section-title">Education</h2>
-      <div class="card-grid">
-        <article class="card">
-          <h3>BTech in Information Technology</h3>
-          <p><strong>Kwantlen Polytechnic University (KPU)</strong> · Surrey, BC</p>
-          <p class="card-meta">Expected graduation: 2027 · GPA: 3.37 / 4.33</p>
-          <p class="card-note">Dean’s Honour Roll: Fall 2024 & Summer 2025</p>
-          <ul class="compact-list">
-        <li>Advanced Web App Development (A+)</li>
-        <li>Data Warehousing & Mining (A)</li>
-        <li>Business Ethics (A+)</li>
-        <li>Content Management & Info Architecture (A)</li>
-        <li>Search Engine Principles (A-)</li>
-        <li>Project Management (A-)</li>
-          </ul>
-        </article>
-
-        <article class="card">
-          <h3>Diploma in Computer Information Systems</h3>
-          <p><strong>Kwantlen Polytechnic University (KPU)</strong></p>
-          <p class="card-meta">2019 – 2021</p>
-        </article>
-
-        <article class="card">
-          <h3>Certifications</h3>
-          <ul class="compact-list">
-            <li>Google Digital Marketing & E-commerce</li>
-            <li>Financial Accounting & Fundamentals</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="section">
-      <h2 class="section-title">Contact</h2>
-      <p class="section-text">
-        I’m open to co-op placements, internships, and collaborations on web, data, or AI-driven projects.
-      </p>
-      <div class="contact-grid">
-        <div>
-          <p><strong>Location</strong><br />Surrey, BC · Canada</p>
         </div>
-        <div>
-          <p><strong>Email (personal)</strong><br />
-            <a href="mailto:inderpreetkaur762@gmail.com">inderpreetkaur762@gmail.com</a>
-          </p>
-          <p><strong>Email (student)</strong><br />
-            <a href="mailto:inderpreetkaur2@student.email.kpu">inderpreetkaur2@student.email.kpu</a>
-          </p>
-          <p><strong>Phone Number</strong><br />
-            <a href="tel:17783254020">+1 (778) 325-4020</a>
-          </p>
-        </div>
-        <div>
-          <p><strong>LinkedIn</strong><br />
-            <a href="https://www.linkedin.com/in/inderpreet-kaur29/" target="_blank">
-              linkedin.com/in/inderpreet-kaur29
-            </a>
-          </p>
+        <div class="pc-bottom">
+          <div class="pc-quote">"I turn real problems from <b>construction sites</b>, <b>immigration offices</b>, and the classroom into software that actually works."</div>
+          <div class="pc-cta">
+            <a href="https://inderpreet-k.github.io/Inderpreet_Kaur_Resume.pdf" class="pc-btn dk" target="_blank">Download Resume ↗</a>
+            <a href="mailto:inderpreetkaur762@gmail.com" class="pc-btn ol">Send Email →</a>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-      <p>© 2026 Inderpreet Kaur.</p>
-      <p>
-        <a href="https://www.linkedin.com/in/inderpreet-kaur29/" target="_blank" class="footer-link">
-          LinkedIn
-        </a>
-        · Built & deployed with GitHub Pages.
-      </p>
-    </footer>
+</div>
 
-  </main>
+<!-- mobile tab bar OUTSIDE app so it's always visible -->
+<div class="mob-tabs">
+  <div class="mob-tabs-inner">
+    <button class="mob-tab on" onclick="goTo(0)"><i class="mob-tab-icon">⌂</i><span class="mob-tab-lbl">Home</span></button>
+    <button class="mob-tab" onclick="goTo(1)"><i class="mob-tab-icon">◈</i><span class="mob-tab-lbl">Projects</span></button>
+    <button class="mob-tab" onclick="goTo(2)"><i class="mob-tab-icon">◉</i><span class="mob-tab-lbl">Skills</span></button>
+    <button class="mob-tab" onclick="goTo(3)"><i class="mob-tab-icon">◎</i><span class="mob-tab-lbl">About</span></button>
+    <button class="mob-tab" onclick="goTo(4)"><i class="mob-tab-icon">◌</i><span class="mob-tab-lbl">Contact</span></button>
+  </div>
+</div>
 
+<script>
+const cur_el=document.getElementById('cursor'),ring_el=document.getElementById('cursor-ring');
+if(cur_el){document.addEventListener('mousemove',e=>{cur_el.style.left=e.clientX+'px';cur_el.style.top=e.clientY+'px';ring_el.style.left=e.clientX+'px';ring_el.style.top=e.clientY+'px';});}
+
+const pages=['ph','pp','psk','pa','pc'];
+let cur=0,busy=false;
+
+function goTo(idx){
+  if(idx===cur)return;
+  if(busy){
+    busy=false;
+    pages.forEach(id=>{const el=document.getElementById(id);el.classList.remove('siR','siL','soL','soR');});
+  }
+  busy=true;
+  const dir=idx>cur?'left':'right';
+  const from=document.getElementById(pages[cur]);
+  const to=document.getElementById(pages[idx]);
+  to.style.opacity='1';
+  to.style.pointerEvents='all';
+  from.classList.add(dir==='left'?'soL':'soR');
+  to.classList.add(dir==='left'?'siR':'siL');
+  let done=false;
+  const finish=()=>{
+    if(done)return;
+    done=true;
+    from.classList.remove('soL','soR','active');
+    from.style.opacity='';
+    from.style.pointerEvents='';
+    to.classList.remove('siR','siL');
+    to.classList.add('active');
+    cur=idx;
+    busy=false;
+    sync();
+  };
+  from.addEventListener('animationend',finish,{once:true});
+  setTimeout(finish,700);
+}
+
+function sync(){
+  document.querySelectorAll('.pip').forEach((p,i)=>p.classList.toggle('on',i===cur));
+  document.querySelectorAll('.mob-tab').forEach((t,i)=>t.classList.toggle('on',i===cur));
+  const hint=document.getElementById('hint');
+  if(hint)hint.style.opacity=cur===0?'1':'0';
+  closeMenu();
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'||e.key==='ArrowRight')goTo(Math.min(cur+1,4));
+  if(e.key==='ArrowUp'||e.key==='ArrowLeft')goTo(Math.max(cur-1,0));
+});
+
+let wt;
+document.addEventListener('wheel',e=>{
+  let el=e.target;
+  while(el&&el!==document.body){
+    const ov=getComputedStyle(el).overflowY;
+    if((ov==='auto'||ov==='scroll')&&el.scrollHeight>el.clientHeight+2){
+      if(e.deltaY>0&&el.scrollTop+el.clientHeight<el.scrollHeight-2)return;
+      if(e.deltaY<0&&el.scrollTop>2)return;
+      break;
+    }
+    el=el.parentElement;
+  }
+  clearTimeout(wt);
+  wt=setTimeout(()=>{
+    if(e.deltaY>60)goTo(Math.min(cur+1,4));
+    else if(e.deltaY<-60)goTo(Math.max(cur-1,0));
+  },80);
+},{passive:true});
+
+let tx=0,ty=0,scrolling=false;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;scrolling=false;},{passive:true});
+document.addEventListener('touchmove',e=>{if(!scrolling){const dx=Math.abs(e.touches[0].clientX-tx),dy=Math.abs(e.touches[0].clientY-ty);if(dy>dx)scrolling=true;}},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(scrolling)return;
+  const dx=tx-e.changedTouches[0].clientX,dy=ty-e.changedTouches[0].clientY;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>60){
+    if(dx>0)goTo(Math.min(cur+1,4));
+    else goTo(Math.max(cur-1,0));
+  }
+},{passive:true});
+
+function toggleMenu(){
+  const nav=document.querySelector('#'+pages[cur]+' .mob-nav');
+  const hbg=document.querySelector('#'+pages[cur]+' .hamburger');
+  if(!nav)return;
+  const open=nav.classList.toggle('open');
+  if(hbg)hbg.classList.toggle('open',open);
+}
+function closeMenu(){
+  document.querySelectorAll('.mob-nav').forEach(n=>n.classList.remove('open'));
+  document.querySelectorAll('.hamburger').forEach(h=>h.classList.remove('open'));
+}
+function tapCard(el){
+  if(window.matchMedia('(pointer:coarse)').matches){
+    document.querySelectorAll('.pp-card.tapped').forEach(c=>{if(c!==el)c.classList.remove('tapped');});
+    el.classList.toggle('tapped');
+  }
+}
+</script>
 </body>
 </html>
