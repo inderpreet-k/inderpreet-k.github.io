@@ -124,129 +124,108 @@ section{padding:110px 0;}
 /* hide on any screen where it might overlap */
 @media(max-width:1000px){.hero-float{display:none;}}
 
-/* ── PROJECTS ────────────────────────────────── */
-/* COLLAGE: column-span collage, rows auto-size to content */
-.collage{
-  display:grid;
-  grid-template-columns:repeat(12,1fr);
-  grid-auto-rows:auto;
-  gap:14px;
-}
-/* column spans only — height comes from content, no empty space */
-.pc-1{grid-column:1/6;}
-.pc-2{grid-column:6/13;}
-.pc-3{grid-column:1/5;}
-.pc-4{grid-column:5/9;}
-.pc-5{grid-column:9/13;}
-.pc-6{grid-column:1/5;}
-.pc-7{grid-column:5/9;}
-.pc-8{grid-column:9/13;}
+/* ── PROJECTS — big labeled cards, no hover-reveal ── */
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.proj-grid .full{grid-column:1/-1;}
+@media(max-width:800px){.proj-grid{grid-template-columns:1fr;}}
 
-@media(max-width:900px){
-  .collage{grid-template-columns:1fr 1fr;}
-  .pc-1,.pc-2,.pc-3,.pc-4,.pc-5,.pc-6,.pc-7,.pc-8{grid-column:auto;}
-}
-@media(max-width:560px){
-  .collage{grid-template-columns:1fr;}
-}
-
-/* card base */
-.pc{
-  background:var(--white);border-radius:14px;padding:24px 26px;
-  position:relative;overflow:hidden;
+.pcard{
+  background:var(--white);border-radius:18px;overflow:hidden;
   box-shadow:0 2px 14px rgba(0,0,0,.05);
-  transition:transform .3s cubic-bezier(.2,0,.2,1),box-shadow .3s;
+  transition:transform .25s,box-shadow .25s;
   display:flex;flex-direction:column;
 }
-.pc::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
-  background:var(--accent);transform:scaleY(0);transform-origin:bottom;
-  transition:transform .35s cubic-bezier(.4,0,.2,1);border-radius:4px 0 0 4px;
-}
-.pc:hover{transform:translateY(-5px);box-shadow:0 18px 52px rgba(0,0,0,.11);}
-.pc:hover::before{transform:scaleY(1);}
+.pcard:hover{transform:translateY(-4px);box-shadow:0 16px 44px rgba(0,0,0,.1);}
 
-/* card header row */
-.pc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+/* image area — shows real screenshot when present, soft gradient fallback until then */
+.pc-media{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;}
+.pc-media img{width:100%;height:100%;object-fit:cover;display:block;}
+
+.pc-body{padding:26px 28px 30px;}
+.full .pc-body{padding:32px 38px 36px;}
+
+.pc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:12px;}
 .pc-type{font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft);}
 .badge{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:20px;font-weight:600;white-space:nowrap;}
 .badge-live{background:#E6F4EA;color:#1B7A35;}
 .badge-done{background:#F0EDEA;color:var(--ink-mid);}
 
-/* title */
 .pc-title{
-  font-family:'Cormorant Garamond',serif;font-weight:600;
-  line-height:1.15;color:var(--ink);margin-bottom:10px;
+  font-family:'Cormorant Garamond',serif;font-weight:600;font-size:23px;
+  line-height:1.15;color:var(--ink);margin-bottom:16px;
 }
-.pc-1 .pc-title,.pc-2 .pc-title{font-size:24px;}
-.pc-3 .pc-title{font-size:21px;}
-.pc-4 .pc-title,.pc-5 .pc-title{font-size:18px;}
-.pc-6 .pc-title,.pc-7 .pc-title,.pc-8 .pc-title{font-size:15px;margin-bottom:6px;}
+.full .pc-title{font-size:27px;}
 
-/* stack — always visible */
-.pc-stack{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+/* labeled sections — Goal / Description / Results, always visible */
+.pc-sec{margin-bottom:13px;}
+.pc-sec-label{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:4px;}
+.pc-sec-text{font-size:13.5px;color:var(--ink-mid);line-height:1.65;}
+
+.pc-stack{display:flex;flex-wrap:wrap;gap:5px;margin:16px 0 18px;}
 .pill{
   font-size:10.5px;letter-spacing:.03em;
   background:var(--accent-lt);color:var(--accent);
   padding:2px 9px;border-radius:20px;
 }
 
-/* links row — always visible */
-.pc-links{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
-.pc-link{
-  font-size:11.5px;color:var(--accent);text-decoration:none;
-  letter-spacing:.03em;border-bottom:1px solid rgba(196,98,45,.3);
-  padding-bottom:1px;transition:border-color .2s;
+/* big clickable buttons */
+.pc-links{display:flex;gap:10px;flex-wrap:wrap;}
+.pc-btn{
+  font-size:12.5px;font-weight:500;letter-spacing:.02em;color:var(--accent);
+  border:1.5px solid var(--accent);padding:9px 22px;border-radius:30px;
+  text-decoration:none;transition:background .2s,color .2s;
 }
-.pc-link:hover{border-color:var(--accent);}
+.pc-btn:hover{background:var(--accent);color:var(--white);}
 
-/* summary — always visible, no clamping */
-.pc-summary{
-  font-size:13px;color:var(--ink-mid);line-height:1.6;
-  margin-top:8px;
-  transition:opacity .2s, max-height .3s;
-  max-height:120px; overflow:hidden; opacity:1;
+/* ── EXPERIENCE — vertical timeline ──────────── */
+.timeline{position:relative;padding-left:36px;}
+.timeline::before{
+  content:'';position:absolute;left:6px;top:8px;bottom:8px;width:2px;
+  background:var(--border);
 }
-.pc:hover .pc-summary{
-  max-height:0; opacity:0; margin-top:0;
+.tl-item{position:relative;padding-bottom:48px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-dot{
+  position:absolute;left:-36px;top:5px;width:13px;height:13px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--ink-soft);
+}
+.tl-item.featured .tl-dot{
+  width:15px;height:15px;left:-37px;top:4px;
+  background:var(--accent);border-color:var(--accent);
+  box-shadow:0 0 0 5px var(--accent-lt);
 }
 
-/* description — slides in on hover */
-.pc-desc{
-  font-size:13px;color:var(--ink-mid);line-height:1.65;
-  max-height:0;overflow:hidden;opacity:0;margin-top:0;
-  transition:max-height .4s cubic-bezier(.4,0,.2,1), opacity .25s .1s, margin .3s;
-}
-.pc:hover .pc-desc{max-height:200px;opacity:1;margin-top:8px;}
-
-/* small cards */
-.pc-6 .pc-summary,.pc-7 .pc-summary,.pc-8 .pc-summary{font-size:12px;}
-.pc-6 .pc-desc,.pc-7 .pc-desc,.pc-8 .pc-desc{font-size:12px;}
-
-/* ── EXPERIENCE ──────────────────────────────── */
-.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-@media(max-width:700px){.exp-grid{grid-template-columns:1fr;}}
-
-.exp-card{
-  background:var(--white);border-radius:14px;padding:32px;
-  box-shadow:0 2px 14px rgba(0,0,0,.05);
-  transition:transform .25s,box-shadow .25s;
-}
-.exp-card:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.09);}
-.exp-card-wide{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
-@media(max-width:700px){.exp-card-wide{grid-template-columns:1fr;}}
-
-.exp-period{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:5px;}
-.exp-period-now{color:var(--accent);font-weight:500;}
-.exp-role{font-size:18px;font-weight:500;color:var(--ink);margin-bottom:4px;}
-.exp-org{font-size:13px;color:var(--ink-mid);margin-bottom:14px;}
-.exp-org .chip{
+.tl-period{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;}
+.tl-period-now{color:var(--accent);font-weight:500;}
+.tl-role{font-size:19px;font-weight:500;color:var(--ink);margin-bottom:3px;font-family:'Cormorant Garamond',serif;}
+.tl-item.featured .tl-role{font-size:26px;font-weight:600;}
+.tl-org{font-size:13px;color:var(--ink-mid);margin-bottom:16px;}
+.tl-org .chip{
   display:inline-block;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--accent);border:1px solid var(--accent);padding:1px 7px;border-radius:20px;margin-left:8px;
 }
-.exp-desc{font-size:13.5px;color:var(--ink-mid);line-height:1.7;}
-.exp-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+
+.tl-status{
+  display:inline-block;font-size:11px;color:var(--accent);background:var(--accent-lt);
+  padding:4px 12px;border-radius:20px;margin-bottom:16px;letter-spacing:.02em;
+}
+
+.tl-bullets{list-style:none;}
+.tl-bullets li{
+  position:relative;padding-left:18px;margin-bottom:10px;
+  font-size:13.5px;color:var(--ink-mid);line-height:1.65;
+}
+.tl-bullets li::before{content:'–';position:absolute;left:0;color:var(--accent);font-weight:600;}
+.tl-item.featured .tl-bullets li{font-size:14px;}
+
+.tl-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;}
 .etag{font-size:10.5px;background:#F0EDEA;color:var(--ink-mid);padding:3px 10px;border-radius:20px;letter-spacing:.04em;}
+
+.tl-panel{
+  background:var(--white);border-radius:14px;padding:28px 32px;
+  box-shadow:0 2px 14px rgba(0,0,0,.05);
+}
+.tl-item.featured .tl-panel{padding:36px 40px;box-shadow:0 6px 28px rgba(0,0,0,.07);}
 
 /* ── SKILLS ──────────────────────────────────── */
 .skills-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
@@ -381,7 +360,7 @@ section{padding:110px 0;}
       <a href="#contact" class="btn-text">Get in touch →</a>
     </div>
     <div class="hero-stats">
-      <div class="hstat"><span class="hstat-val">3.41</span><span class="hstat-lbl">GPA / 4.33</span></div>
+      <div class="hstat"><span class="hstat-val">3.43</span><span class="hstat-lbl">GPA / 4.33</span></div>
       <div class="hstat"><span class="hstat-val">×4</span><span class="hstat-lbl">Dean's Honour Roll</span></div>
       <div class="hstat"><span class="hstat-val">2</span><span class="hstat-lbl">Live apps</span></div>
       <div class="hstat"><span class="hstat-val">92%</span><span class="hstat-lbl">Sentinel AI accuracy</span></div>
@@ -410,123 +389,165 @@ section{padding:110px 0;}
 <section id="projects">
   <div class="wrap">
     <p class="eyebrow">Projects</p>
-    <div class="collage">
+    <div class="proj-grid">
 
-      <!-- 1 TransLink — FEATURED -->
-      <div class="pc pc-1">
-        <div class="pc-head">
-          <span class="pc-type">Data · Analytics · Transit · Technical Lead</span>
-          <span class="badge" style="background:#FFF3E0;color:#E65100;">In Progress</span>
+      <!-- 1 TransLink — full width -->
+      <div class="pcard full">
+        <div class="pc-media" style="background:linear-gradient(135deg,#E8D5C4,#C8DDD4);">
+          <img src="Projects/TranslinkTransit.png" alt="TransLink Transit Intelligence dashboard" onerror="this.style.display='none'">
         </div>
-        <h3 class="pc-title">TransLink Transit Intelligence</h3>
-        <p class="pc-summary">GTFS-powered commuter dashboard analyzing 242 routes and 63,250 weekly trips — plain-language route recommendations and interactive network visualizations. Technical Lead on a KPU capstone team.</p>
-        <div class="pc-stack">
-          <span class="pill">PostgreSQL</span><span class="pill">Flask</span><span class="pill">Chart.js</span><span class="pill">GTFS</span><span class="pill">Pandas</span><span class="pill">K-Means</span>
+        <div class="pc-body">
+          <div class="pc-head">
+            <span class="pc-type">Data · Analytics · Transit · Technical Lead</span>
+            <span class="badge" style="background:#FFF3E0;color:#E65100;">In Progress</span>
+          </div>
+          <h3 class="pc-title">TransLink Transit Intelligence</h3>
+
+          <div class="pc-sec">
+            <p class="pc-sec-label">Goal</p>
+            <p class="pc-sec-text">Give TransLink riders plain-language route recommendations and interactive network visualizations, powered by full production GTFS data.</p>
+          </div>
+          <div class="pc-sec">
+            <p class="pc-sec-label">Description</p>
+            <p class="pc-sec-text">Technical Lead on a KPU capstone team. Designed the two-layer PostgreSQL schema (raw staging + curated), full ERD, and dashboard wireframes across four views — Network Overview, Route Analyser, Stop Deep-Dive, Comparison Tool.</p>
+          </div>
+          <div class="pc-sec">
+            <p class="pc-sec-label">Results</p>
+            <p class="pc-sec-text">Schema validated against 242 routes, 63,250 weekly trips, and 1.85M+ stop-time records. Design phase complete with an A+ (INFO 4190). Implementation begins INFO 4290, Sep–Dec 2026.</p>
+          </div>
+
+          <div class="pc-stack">
+            <span class="pill">PostgreSQL</span><span class="pill">Flask</span><span class="pill">Chart.js</span><span class="pill">GTFS</span><span class="pill">Pandas</span><span class="pill">K-Means</span>
+          </div>
+          <div class="pc-links">
+            <a href="https://github.com/inderpreet-k/translink-transit-intelligence" target="_blank" class="pc-btn">GitHub ↗</a>
+          </div>
         </div>
-        <div class="pc-links">
-          <a href="https://github.com/inderpreet-k/translink-transit-intelligence" target="_blank" class="pc-link" onclick="event.stopPropagation()">GitHub ↗</a>
-        </div>
-        <p class="pc-desc">Design phase May–Aug 2026 (INFO 4190) — architecture, GTFS field mapping, ERD, dashboard wireframes (Network Overview · Route Analyser · Stop Deep-Dive · Comparison Tool), and user testing. Implementation TBD in INFO 4290 next semester. Live GTFS feed updated weekly.</p>
       </div>
 
-      <!-- 2 Sentinel AI — BIGGEST -->
-      <div class="pc pc-2">
-        <div class="pc-head">
-          <span class="pc-type">AI · ML · Cybersecurity</span>
-          <span class="badge badge-live">Live</span>
+      <!-- 2 Sentinel AI — full width -->
+      <div class="pcard full">
+        <div class="pc-media" style="background:linear-gradient(135deg,#D4C8E0,#BDD8E0);">
+          <img src="Projects/SentinelAI.png" alt="Sentinel AI dashboard" onerror="this.style.display='none'">
         </div>
-        <h3 class="pc-title">Sentinel AI — Web Firewall</h3>
-        <p class="pc-summary">ML web firewall with 92% accuracy, 0 critical false negatives. Live multi-tenant API with SDKs for PHP, JS, and Python.</p>
-        <div class="pc-stack">
-          <span class="pill">Python</span><span class="pill">Scikit-Learn</span><span class="pill">FastAPI</span><span class="pill">PostgreSQL</span><span class="pill">TF-IDF</span>
+        <div class="pc-body">
+          <div class="pc-head">
+            <span class="pc-type">AI · ML · Cybersecurity</span>
+            <span class="badge badge-live">Live</span>
+          </div>
+          <h3 class="pc-title">Sentinel AI — Web Firewall</h3>
+
+          <div class="pc-sec">
+            <p class="pc-sec-label">Goal</p>
+            <p class="pc-sec-text">Build a real-time ML web firewall any site can drop in to screen incoming requests for attacks — not just a single local app.</p>
+          </div>
+          <div class="pc-sec">
+            <p class="pc-sec-label">Description</p>
+            <p class="pc-sec-text">Rebuilt from a single-machine PHP/MySQL academic prototype into a hosted, multi-tenant security API. Combines explicit rule matching with a trained ML classifier, deployed as FastAPI + PostgreSQL with SDKs for PHP, JS, and Python.</p>
+          </div>
+          <div class="pc-sec">
+            <p class="pc-sec-label">Results</p>
+            <p class="pc-sec-text">92% detection accuracy, 0 critical false negatives across SQL injection, XSS, and OS command injection — Random Forest trained on 24,161 labeled payloads. Currently protecting Spending Spotlight in production.</p>
+          </div>
+
+          <div class="pc-stack">
+            <span class="pill">Python</span><span class="pill">Scikit-Learn</span><span class="pill">FastAPI</span><span class="pill">PostgreSQL</span><span class="pill">TF-IDF</span>
+          </div>
+          <div class="pc-links">
+            <a href="https://sentinel-ai-web.onrender.com/" target="_blank" class="pc-btn">Live demo ↗</a>
+            <a href="https://github.com/inderpreet-k/sentinel-ai" target="_blank" class="pc-btn">GitHub ↗</a>
+          </div>
         </div>
-        <div class="pc-links">
-          <a href="https://sentinel-ai-web.onrender.com/" target="_blank" class="pc-link" onclick="event.stopPropagation()">Live demo ↗</a>
-          <a href="https://github.com/inderpreet-k/sentinel-ai" target="_blank" class="pc-link" onclick="event.stopPropagation()">GitHub ↗</a>
-        </div>
-        <p class="pc-desc">92% accuracy, 0 critical false negatives across SQL injection, XSS, and OS command injection. Random Forest on 24,161 labeled payloads using character-level TF-IDF n-gram vectorization. Deployed as FastAPI + PostgreSQL multi-tenant API with SDKs in PHP, JS, and Python.</p>
       </div>
 
       <!-- 3 Spending Spotlight -->
-      <div class="pc pc-3">
-        <div class="pc-head">
-          <span class="pc-type">AI · React · Deployed</span>
-          <span class="badge badge-live">Live</span>
+      <div class="pcard">
+        <div class="pc-media" style="background:linear-gradient(135deg,#F2DCAA,#E8D5C4);">
+          <img src="Projects/SpendingSpotlight.png" alt="Spending Spotlight app screenshot" onerror="this.style.display='none'">
         </div>
-        <h3 class="pc-title">Spending Spotlight</h3>
-        <p class="pc-summary">Upload a bank statement, get your spending classified and flagged automatically. Built with OpenAI and deployed on Vercel.</p>
-        <div class="pc-stack">
-          <span class="pill">React</span><span class="pill">OpenAI API</span><span class="pill">Python</span><span class="pill">Vercel</span>
+        <div class="pc-body">
+          <div class="pc-head">
+            <span class="pc-type">AI · React · Deployed</span>
+            <span class="badge badge-live">Live</span>
+          </div>
+          <h3 class="pc-title">Spending Spotlight</h3>
+
+          <div class="pc-sec">
+            <p class="pc-sec-label">Goal</p>
+            <p class="pc-sec-text">Let anyone upload a bank statement and instantly see which transactions were expected vs. unexpected.</p>
+          </div>
+          <div class="pc-sec">
+            <p class="pc-sec-label">Description</p>
+            <p class="pc-sec-text">React frontend, Flask backend, GPT-4o-mini classification. Diagnosed real-world noise from Chase statement formatting and engineered pattern filtering end-to-end. Every request is screened live by Sentinel AI before processing.</p>
+          </div>
+
+          <div class="pc-stack">
+            <span class="pill">React</span><span class="pill">OpenAI API</span><span class="pill">Python</span><span class="pill">Vercel</span>
+          </div>
+          <div class="pc-links">
+            <a href="https://spending-spotlight.vercel.app/" target="_blank" class="pc-btn">Live demo ↗</a>
+          </div>
         </div>
-        <div class="pc-links">
-          <a href="https://spending-spotlight.vercel.app/" target="_blank" class="pc-link" onclick="event.stopPropagation()">Live demo ↗</a>
-        </div>
-        <p class="pc-desc">Accepts PDF bank statements, classifies transactions via OpenAI and flags unexpected spending. Diagnosed real-world noise from Chase statement injection and engineered pattern filtering end-to-end.</p>
       </div>
 
-      <!-- 4 Text-to-SQL -->
-      <div class="pc pc-4">
-        <div class="pc-head">
-          <span class="pc-type">AI · Python · NLP</span>
-          <span class="badge badge-done">Solo</span>
+      <!-- 4 Catering -->
+      <div class="pcard">
+        <div class="pc-media" style="background:linear-gradient(135deg,#C8DDD4,#F2DCAA);">
+          <img src="Projects/Catering.png" alt="Catering Management System screenshot" onerror="this.style.display='none'">
         </div>
-        <h3 class="pc-title">Text-to-SQL Generator</h3>
-        <p class="pc-summary">Ask a question in plain English, get a working SQL query. Strict safety constraints ensure only valid SELECT statements run.</p>
-        <div class="pc-stack">
-          <span class="pill">Python</span><span class="pill">SQLite</span><span class="pill">OpenAI API</span><span class="pill">Jupyter</span>
+        <div class="pc-body">
+          <div class="pc-head">
+            <span class="pc-type">Full Stack · Backend Lead</span>
+            <span class="badge badge-done">Team</span>
+          </div>
+          <h3 class="pc-title">Catering Management System</h3>
+
+          <div class="pc-sec">
+            <p class="pc-sec-label">Goal</p>
+            <p class="pc-sec-text">Give a catering business one platform to run admin, staff, and customer operations from.</p>
+          </div>
+          <div class="pc-sec">
+            <p class="pc-sec-label">Description</p>
+            <p class="pc-sec-text">Full-stack system with separate admin, staff, and customer portals. Led backend architecture and relational schema design, and coordinated front-end integration across the team.</p>
+          </div>
+
+          <div class="pc-stack">
+            <span class="pill">PHP</span><span class="pill">MySQL</span><span class="pill">XAMPP</span>
+          </div>
+          <div class="pc-links">
+            <a href="https://github.com/inderpreet-k/catering-management-system" target="_blank" class="pc-btn">GitHub ↗</a>
+          </div>
         </div>
-        <div class="pc-links">
-          <a href="https://colab.research.google.com/drive/1X08TA_YIJ_Zq53ScqMiCC7u15RvJ8J_g" target="_blank" class="pc-link" onclick="event.stopPropagation()">Open notebook ↗</a>
-        </div>
-        <p class="pc-desc">Natural-language to SQL via GPT. Strict constraints (temp=0, regex post-processing) ensure only valid SELECT statements reach the DB. 92% simple SELECT, 85% filtered WHERE, 70% aggregations.</p>
       </div>
 
-      <!-- 5 Recipe Search -->
-      <div class="pc pc-5">
-        <div class="pc-head">
-          <span class="pc-type">NLP · IR · Flask</span>
-          <span class="badge badge-done">Team of 4</span>
+      <!-- 5 Shape Catcher -->
+      <div class="pcard">
+        <div class="pc-media" style="background:linear-gradient(135deg,#E8D5C4,#D4C8E0);">
+          <img src="Projects/Game.png" alt="Shape and Color Catcher game screenshot" onerror="this.style.display='none'">
         </div>
-        <h3 class="pc-title">Recipe Search Engine</h3>
-        <p class="pc-summary">Search engine across 13.5K recipes with personalized ranking and sub-500ms query time.</p>
-        <div class="pc-stack">
-          <span class="pill">NLTK</span><span class="pill">Flask</span><span class="pill">TF-IDF</span>
-        </div>
-        <p class="pc-desc">Two-stage IR system. 13.5K recipes, 1.28M postings, 41% index cut, &lt;500ms query time. My role: architecture, TF-IDF limitation analysis, Precision@10 evaluation.</p>
-      </div>
+        <div class="pc-body">
+          <div class="pc-head">
+            <span class="pc-type">Game · Educational</span>
+            <span class="badge badge-done">Solo</span>
+          </div>
+          <h3 class="pc-title">Shape & Color Catcher</h3>
 
-      <!-- 6 Catering -->
-      <div class="pc pc-6">
-        <div class="pc-head">
-          <span class="pc-type">Full Stack · Backend Lead</span>
-          <span class="badge badge-done">Team</span>
-        </div>
-        <h3 class="pc-title">Catering Management System</h3>
-        <p class="pc-summary">Full-stack catering platform with separate admin, staff, and customer portals. I led the backend.</p>
-        <div class="pc-stack">
-          <span class="pill">PHP</span><span class="pill">MySQL</span><span class="pill">XAMPP</span>
-        </div>
-        <div class="pc-links">
-          <a href="https://github.com/inderpreet-k/catering-management-system" target="_blank" class="pc-link" onclick="event.stopPropagation()">GitHub ↗</a>
-        </div>
-        <p class="pc-desc">Full-stack system with admin, staff and customer portals. Led backend architecture and relational schema design — coordinated front-end integration across the team.</p>
-      </div>
+          <div class="pc-sec">
+            <p class="pc-sec-label">Goal</p>
+            <p class="pc-sec-text">Teach young kids shape and colour recognition through play.</p>
+          </div>
+          <div class="pc-sec">
+            <p class="pc-sec-label">Description</p>
+            <p class="pc-sec-text">Interactive educational game built solo in Processing/Java — catch and sort falling shapes by colour in real time.</p>
+          </div>
 
-      <!-- 7 Shape Catcher -->
-      <div class="pc pc-7">
-        <div class="pc-head">
-          <span class="pc-type">Game · Educational</span>
-          <span class="badge badge-done">Solo</span>
+          <div class="pc-stack">
+            <span class="pill">Processing</span><span class="pill">Java</span>
+          </div>
+          <div class="pc-links">
+            <a href="https://youtu.be/r7MFN_UnLB8" target="_blank" class="pc-btn">Watch demo ↗</a>
+          </div>
         </div>
-        <h3 class="pc-title">Shape & Color Catcher</h3>
-        <p class="pc-summary">Educational kids game — catch and sort falling shapes by color in real time.</p>
-        <div class="pc-stack">
-          <span class="pill">Processing</span><span class="pill">Java</span>
-        </div>
-        <div class="pc-links">
-          <a href="https://youtu.be/r7MFN_UnLB8" target="_blank" class="pc-link" onclick="event.stopPropagation()">Watch demo ↗</a>
-        </div>
-        <p class="pc-desc">Interactive educational game built in Processing/Java. Designed for young kids to learn shape and colour recognition through play.</p>
       </div>
 
     </div>
@@ -537,62 +558,91 @@ section{padding:110px 0;}
 <section id="experience">
   <div class="wrap">
     <p class="eyebrow">Experience</p>
-    <div class="exp-grid">
+    <div class="timeline">
 
-      <!-- Fraser Health — wide -->
-      <div class="exp-card exp-card-wide">
-        <div>
-          <p class="exp-period"><span class="exp-period-now">Jun 2026 — Present</span></p>
-          <p class="exp-role">Digital Enablement Co-op Student</p>
-          <p class="exp-org">Fraser Health Authority <span class="chip">Co-op</span></p>
-          <p class="exp-desc">Supporting infrastructure security reporting modernization. Documenting current-state vulnerability reporting inputs using Ivanti Security Controls, producing data inventory and field-mapping documentation, and designing an automated monthly dashboard via Microsoft Power Platform. Collaborating with Infrastructure and Information Security leadership to validate reporting parameters.</p>
-        </div>
-        <div>
-          <p class="exp-desc" style="margin-bottom:14px">Deliverables include an operational runbook, data dictionary, and sustainability recommendations for long-term maintainability.</p>
-          <div class="exp-tags">
-            <span class="etag">Power Platform</span>
+      <!-- Fraser Health — featured -->
+      <div class="tl-item featured">
+        <div class="tl-dot"></div>
+        <div class="tl-panel">
+          <p class="tl-period"><span class="tl-period-now">Jun 2026 — Present</span></p>
+          <p class="tl-role">Digital Enablement Co-op Student</p>
+          <p class="tl-org">Fraser Health Authority <span class="chip">Co-op</span></p>
+          <span class="tl-status">Built &amp; self-tested — rollout to real users in progress</span>
+          <ul class="tl-bullets">
+            <li>Automated a monthly infrastructure vulnerability reporting process — previously a fully manual, ~1-week effort every month — into a self-service Power BI platform</li>
+            <li>Built a folder-based ingestion pipeline with dynamic filename parsing (reporting period, application name), so new monthly reports flow in with zero manual setup</li>
+            <li>Cleaned and modeled merged multi-report datasets in Power Query — automated removal of blank rows, footer rows, and repeated headers introduced when combining monthly workbooks</li>
+            <li>Implemented Role-Level Security with dynamic user-to-asset mapping so each application owner sees only their own data, removing manual report distribution</li>
+            <li>Designed executive and operational dashboards covering vulnerability trends, severity breakdown, vulnerability aging, and machine/asset-level views</li>
+            <li>Authored a data dictionary and operational runbook to support long-term maintainability</li>
+          </ul>
+          <div class="tl-tags">
             <span class="etag">Power BI</span>
+            <span class="etag">Power Query</span>
+            <span class="etag">Power Automate</span>
+            <span class="etag">Power Platform</span>
             <span class="etag">Ivanti Security Controls</span>
             <span class="etag">Data Mapping</span>
             <span class="etag">Security Reporting</span>
-            <span class="etag">Power Automate</span>
           </div>
         </div>
       </div>
 
       <!-- Nexgen -->
-      <div class="exp-card">
-        <p class="exp-period">Mar 2025 — Present</p>
-        <p class="exp-role">Office Administrator</p>
-        <p class="exp-org">Nexgen Electrical Ltd. <span class="chip">Part-time</span></p>
-        <p class="exp-desc">Managing $800K–$1.2M/month in invoices, SOVs, and POs across a $15–20M active project portfolio. Payroll for 30+ employees, compliance documentation, QuickBooks.</p>
-        <div class="exp-tags">
-          <span class="etag">QuickBooks</span><span class="etag">Payroll</span><span class="etag">Financial Reporting</span>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-panel">
+          <p class="tl-period">Mar 2025 — Present</p>
+          <p class="tl-role">Office Administrator</p>
+          <p class="tl-org">Nexgen Electrical Ltd. <span class="chip">Part-time</span></p>
+          <ul class="tl-bullets">
+            <li>Manage $800K–$1.2M/month in invoices, SOVs, and POs across a $15–20M active project portfolio</li>
+            <li>Run payroll for 30+ employees and maintain compliance documentation in QuickBooks</li>
+          </ul>
+          <div class="tl-tags">
+            <span class="etag">QuickBooks</span><span class="etag">Payroll</span><span class="etag">Financial Reporting</span>
+          </div>
         </div>
       </div>
 
       <!-- Element -->
-      <div class="exp-card">
-        <p class="exp-period">May 2023 — Mar 2025</p>
-        <p class="exp-role">Office Assistant / Bookkeeper</p>
-        <p class="exp-org">Element Immigration Inc.</p>
-        <p class="exp-desc">50–150 active CRM files. Financial reconciliations, payroll, tax reconciliation, scheduling, and client case documentation.</p>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-panel">
+          <p class="tl-period">May 2023 — Mar 2025</p>
+          <p class="tl-role">Office Assistant / Bookkeeper</p>
+          <p class="tl-org">Element Immigration Inc.</p>
+          <ul class="tl-bullets">
+            <li>Maintained 50–150 active CRM files</li>
+            <li>Handled financial reconciliations, payroll, tax reconciliation, scheduling, and client case documentation</li>
+          </ul>
+        </div>
       </div>
 
       <!-- Enfield -->
-      <div class="exp-card">
-        <p class="exp-period">Aug 2021 — May 2023</p>
-        <p class="exp-role">Bookkeeper</p>
-        <p class="exp-org">Enfield Solutions Inc.</p>
-        <p class="exp-desc">Full-cycle bookkeeping, GST and corporate filings, payroll.</p>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-panel">
+          <p class="tl-period">Aug 2021 — May 2023</p>
+          <p class="tl-role">Bookkeeper</p>
+          <p class="tl-org">Enfield Solutions Inc.</p>
+          <ul class="tl-bullets">
+            <li>Full-cycle bookkeeping, GST and corporate filings, payroll</li>
+          </ul>
+        </div>
       </div>
 
       <!-- Dollar Up -->
-      <div class="exp-card">
-        <p class="exp-period">Oct 2019 — Oct 2023</p>
-        <p class="exp-role">Store Supervisor</p>
-        <p class="exp-org">Dollar Up</p>
-        <p class="exp-desc">Staff scheduling, inventory management, cash operations, customer service.</p>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-panel">
+          <p class="tl-period">Oct 2019 — Oct 2023</p>
+          <p class="tl-role">Store Supervisor</p>
+          <p class="tl-org">Dollar Up</p>
+          <ul class="tl-bullets">
+            <li>Staff scheduling, inventory management, cash operations, customer service</li>
+          </ul>
+        </div>
       </div>
 
     </div>
@@ -641,7 +691,7 @@ section{padding:110px 0;}
       <div class="edu-card">
         <p class="edu-degree">Bachelor of Technology — Information Technology</p>
         <p class="edu-school">Kwantlen Polytechnic University · Surrey, BC · Graduating June 2027</p>
-        <p class="edu-courses"><strong>Relevant courses:</strong> Advanced Web App Dev (A+) · Data Warehousing & Mining (A) · Search Engine Principles (A−) · Software Quality Assurance (A−) · Mobile Programming (A+) · Project Management (A−) · OO Software Engineering · Database Systems · Statistics</p>
+        <p class="edu-courses"><strong>Relevant courses:</strong> Project Integration 1 (A+) · Advanced Web App Dev (A+) · Data Warehousing & Mining (A) · Search Engine Principles (A−) · Software Quality Assurance (A−) · Mobile Programming (A+) · Project Management (A−) · OO Software Engineering · Database Systems · Statistics</p>
       </div>
       <div class="edu-card">
         <p class="edu-degree">Diploma — Computer Information Systems</p>
@@ -649,7 +699,7 @@ section{padding:110px 0;}
         <p class="edu-courses">Foundation in systems, databases, and programming. Transitioned into BTech IT to deepen expertise in software engineering and data.</p>
       </div>
       <div class="stats-row">
-        <div class="astat"><p class="astat-val">3.41</p><p class="astat-lbl">GPA / 4.33</p></div>
+        <div class="astat"><p class="astat-val">3.43</p><p class="astat-lbl">GPA / 4.33</p></div>
         <div class="astat"><p class="astat-val">×4</p><p class="astat-lbl">Dean's Honour Roll</p></div>
         <div class="astat"><p class="astat-val">A+</p><p class="astat-lbl">Advanced Web App Dev</p></div>
         <div class="astat"><p class="astat-val">A+</p><p class="astat-lbl">Mobile Programming</p></div>
